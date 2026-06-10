@@ -1,0 +1,251 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF8F5 0%, #FFF0EC 30%, #F5F0FF 70%, #F0F5FF 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── 音乐背景 ── */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* 五线谱线条 */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(196, 30, 58, 0.06) 40px,
+      rgba(196, 30, 58, 0.06) 41px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 18px,
+      rgba(139, 134, 128, 0.12) 18px,
+      rgba(139, 134, 128, 0.12) 19px,
+      transparent 19px,
+      transparent 36px
+    );
+  pointer-events: none;
+}
+
+/* ── 浮动音乐符号 ── */
+.musicNotes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.note {
+  position: absolute;
+  font-size: 28px;
+  font-weight: 700;
+  animation: floatNote 20s linear infinite;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.note:nth-child(1) { top: 8%; left: 3%; font-size: 40px; opacity: 0.25; color: #C41E3A; animation-delay: 0s; }
+.note:nth-child(2) { top: 18%; right: 8%; font-size: 34px; opacity: 0.2; color: #2D5016; animation-delay: -3s; }
+.note:nth-child(3) { top: 48%; left: 5%; font-size: 48px; opacity: 0.2; color: #D4A574; animation-delay: -7s; }
+.note:nth-child(4) { top: 62%; right: 3%; font-size: 30px; opacity: 0.25; color: #C41E3A; animation-delay: -11s; }
+.note:nth-child(5) { top: 78%; left: 12%; font-size: 36px; opacity: 0.2; color: #2D5016; animation-delay: -15s; }
+.note:nth-child(6) { top: 32%; right: 12%; font-size: 32px; opacity: 0.22; color: #D4A574; animation-delay: -5s; }
+.note:nth-child(7) { top: 3%; left: 48%; font-size: 26px; opacity: 0.3; color: #C41E3A; animation-delay: -9s; }
+.note:nth-child(8) { top: 72%; right: 18%; font-size: 42px; opacity: 0.2; color: #8B8680; animation-delay: -13s; }
+.note:nth-child(9) { top: 42%; left: 58%; font-size: 28px; opacity: 0.25; color: #2D5016; animation-delay: -17s; }
+.note:nth-child(10) { top: 12%; right: 38%; font-size: 36px; opacity: 0.2; color: #C41E3A; animation-delay: -2s; }
+.note:nth-child(11) { top: 88%; left: 38%; font-size: 24px; opacity: 0.3; color: #D4A574; animation-delay: -8s; }
+.note:nth-child(12) { top: 56%; left: 78%; font-size: 38px; opacity: 0.22; color: #8B8680; animation-delay: -12s; }
+
+@keyframes floatNote {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(4deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-10px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* ── 五线谱装饰条（底部） ── */
+.staffDecoration {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #C41E3A 0px,
+      transparent 1px,
+      transparent 11px,
+      #C41E3A 11px,
+      transparent 12px,
+      transparent 14px,
+      #C41E3A 14px,
+      transparent 15px,
+      transparent 25px,
+      #C41E3A 25px,
+      transparent 26px
+    );
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* ── 卡片 ── */
+.card {
+  width: 400px;
+  max-width: 90vw;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 300ms ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: var(--space-2);
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.logoText {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+.tagline {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-6);
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: var(--space-5);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tab:hover { color: var(--text-primary); }
+.tabActive {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ── Form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input {
+  height: 40px;
+  padding: 0 14px;
+  font-size: 15px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+.error {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-danger-text);
+  background: var(--color-danger-bg);
+  border-radius: var(--radius-sm);
+}
+
+.submitBtn {
+  height: 42px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.submitBtn:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+.submitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.5;
+}

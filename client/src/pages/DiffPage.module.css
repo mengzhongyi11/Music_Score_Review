@@ -1,0 +1,382 @@
+.page {
+  animation: fadeIn var(--transition-base);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.subtitle strong { color: var(--text-primary); }
+
+.separator {
+  margin: 0 6px;
+  color: var(--text-tertiary);
+}
+
+.versionTag {
+  display: inline-block;
+  padding: 1px 8px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Merge Banner ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mergeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideUp var(--transition-base);
+}
+.mergeSuccess { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success); }
+.mergeError { background: var(--color-danger-bg); color: var(--color-danger-text); border: 1px solid var(--color-danger); }
+.mergeDismiss { font-size: 16px; color: inherit; opacity: 0.6; padding: 2px 6px; border-radius: var(--radius-sm); }
+.mergeDismiss:hover { opacity: 1; }
+
+/* ── 主布局：左右分栏 ── */
+.branchLayout {
+  display: flex;
+  gap: var(--space-4);
+  height: calc(100vh - var(--nav-height) - 160px);
+}
+
+/* ── 左侧边栏：分支列表 ── */
+.branchSidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.branchSidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.branchSidebarTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.branchCount {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+  padding: 0 7px;
+  border-radius: 8px;
+}
+
+.branchGroup {
+  padding: var(--space-2) 0;
+}
+
+.branchGroupLabel {
+  display: block;
+  padding: 4px var(--space-4);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.branchItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 8px var(--space-4);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: left;
+  transition: all var(--transition-fast);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.branchItem:hover { background: var(--bg-hover); color: var(--text-primary); }
+.branchActive { background: var(--color-accent-glow); color: var(--text-primary); font-weight: 500; }
+
+.branchItemDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-warning-text);
+  flex-shrink: 0;
+}
+
+.branchItemName { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.branchItemMeta { font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; }
+
+.branchEmpty {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* ── 右侧内容区 ── */
+.branchContent {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* ── 已合并视图 ── */
+.mergedView {
+  animation: fadeIn var(--transition-base);
+}
+
+.mergedHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: var(--space-4);
+}
+
+.mergedName {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mergedCreator, .mergedDate {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.mergedSectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.mergedSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mergedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 12px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+}
+.mergedSection { font-weight: 500; color: var(--text-primary); min-width: 100px; }
+.mergedContent { color: var(--text-secondary); }
+
+/* ── Diff 内容 ── */
+.diffView {
+  animation: fadeIn var(--transition-base);
+}
+
+.diffBranchInfo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: var(--space-4);
+}
+
+.diffBranchName {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.diffBranchMeta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.diffStats {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.diffStat {
+  text-align: center;
+}
+
+.diffStatValue {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.diffStatLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* ── 对照头部 ── */
+.diffCompareHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  margin-bottom: var(--space-3);
+}
+
+.diffCompareHeader svg {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.diffCompareLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 3px 10px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Diff Row ── */
+.diffList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.diffRow {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  transition: background var(--transition-fast);
+  animation: slideUp 0.3s ease-out;
+}
+
+.diffRow.added { background: var(--color-success-bg); border-left-color: var(--color-success); }
+.diffRow.modified { background: var(--color-warning-bg); border-left-color: var(--color-warning); }
+
+.diffRowSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.diffSectionBadge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.diffSectionName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.diffRowContent {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 28px;
+}
+
+.diffInlineCompare {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.diffOldValue {
+  color: var(--color-danger-text);
+  text-decoration: line-through;
+  font-size: 12px;
+}
+
+.diffArrow {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.diffNewValue {
+  color: var(--color-success-text);
+  font-weight: 500;
+}
+
+.diffActions {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.diffActionsHint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}

@@ -1,0 +1,145 @@
+.timeline {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default);
+  padding: var(--space-3) var(--space-4);
+}
+
+.empty {
+  padding: var(--space-3);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.track {
+  position: relative;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--border-default);
+  transform: translateY(-50%);
+}
+
+.nodes {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.node {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.nodeDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.node:hover .nodeDot {
+  border-color: var(--text-tertiary);
+  transform: scale(1.2);
+}
+
+.current .nodeDot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  width: 16px;
+  height: 16px;
+}
+.current:hover .nodeDot {
+  transform: scale(1.1);
+}
+
+.glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--color-accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+.hasNotes .nodeDot {
+  border-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.nodeLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.current .nodeLabel {
+  color: var(--color-accent);
+}
+
+.nodeAuthor {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.nodeBadge {
+  position: absolute;
+  top: -8px;
+  right: -14px;
+  min-width: 16px;
+  height: 16px;
+  background: var(--color-warning);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+}
+
+.versionTag {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.versionTag strong {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.versionMeta {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}

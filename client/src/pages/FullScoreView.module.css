@@ -1,0 +1,261 @@
+/* ── Page Layout ── */
+.page {
+  animation: fadeIn var(--transition-base);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Toolbar（打印时隐藏） ── */
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.toolbarActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ── Score Content ── */
+.scoreContent {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-10);
+  min-height: 60vh;
+}
+
+/* ── Cover ── */
+.cover {
+  text-align: center;
+  padding: var(--space-10) 0 var(--space-8);
+  border-bottom: 2px solid var(--border-default);
+  margin-bottom: var(--space-8);
+}
+
+.coverTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  letter-spacing: 2px;
+}
+
+.coverComposer {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.coverDesc {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: var(--space-8);
+  page-break-inside: avoid;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.sectionNumber {
+  width: 28px;
+  height: 28px;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sectionName {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sectionTempo {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* ── Staff Rendering ── */
+.staffSection {
+  padding: var(--space-4) 0;
+}
+
+.staffRows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  font-family: var(--font-mono), 'Noto Sans SC', monospace;
+  font-size: 16px;
+  line-height: 2;
+  letter-spacing: 2px;
+}
+
+.measure {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  min-width: 60px;
+  border-right: 1px dashed var(--border-muted);
+}
+
+.note {
+  display: inline-block;
+  text-align: center;
+  min-width: 20px;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.noteHigh {
+  border-top: 1px solid var(--text-primary);
+  padding-top: 2px;
+}
+
+.barline {
+  color: var(--text-tertiary);
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+.staffHeader {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+  padding: 4px 8px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.textSection {
+  padding: var(--space-3) 0;
+}
+
+.textContent {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.sectionLabel {
+  display: none; /* 隐藏标签，结构已经说明了 */
+}
+
+/* ── Footer ── */
+.footer {
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
+  text-align: center;
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* ══════════════════════════════
+   打印样式（隐藏导航、侧边栏）
+   ══════════════════════════════ */
+@media print {
+  /* 隐藏页面非乐谱元素 */
+  .toolbar {
+    display: none !important;
+  }
+
+  /* 隐藏全局导航 */
+  nav, aside, .nav, .sidebar, .topNav, [class*='nav'], [class*='sidebar'] {
+    display: none !important;
+  }
+
+  /* 重置页面边距 */
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* 主内容区占满全屏 */
+  .page {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    animation: none !important;
+  }
+
+  .scoreContent {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 20px !important;
+    background: white !important;
+  }
+
+  * {
+    background: white !important;
+    color: black !important;
+  }
+
+  .coverTitle, .sectionName {
+    color: black !important;
+  }
+
+  .sectionNumber {
+    background: #333 !important;
+  }
+
+  .coverDesc, .subtitle {
+    color: #444 !important;
+  }
+
+  .note {
+    color: black !important;
+  }
+
+  .barline {
+    color: #999 !important;
+  }
+}

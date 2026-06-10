@@ -1,0 +1,44 @@
+.switcher {
+  display: inline-flex;
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  padding: 5px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  transition: color var(--transition-base);
+  cursor: pointer;
+}
+.tab:hover {
+  color: var(--text-primary);
+}
+.tab.active {
+  color: var(--text-primary);
+}
+
+.indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: calc(50% - 3px);
+  background: var(--bg-hover);
+  border-radius: 4px;
+  transition: transform var(--transition-base);
+  z-index: 0;
+}
+.left {
+  transform: translateX(0);
+}
+.right {
+  transform: translateX(calc(100% + 2px));
+}

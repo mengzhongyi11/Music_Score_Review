@@ -1,0 +1,418 @@
+.container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  gap: var(--space-4);
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+.emptyText {
+  font-size: 15px;
+  color: var(--text-tertiary);
+}
+
+/* ── 工具栏 ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.toolbarActions {
+  display: flex;
+  gap: 4px;
+}
+
+.toolBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+.toolBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ── 协作光标层 ── */
+.cursorLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cursor {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  transition: left 100ms ease-out, top 100ms ease-out;
+}
+
+.cursor svg {
+  display: block;
+}
+
+.cursorLabel {
+  position: absolute;
+  top: 14px;
+  left: 6px;
+  font-size: 10px;
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── 乐谱滚动区 ── */
+.scrollArea {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.staffSystem {
+  min-width: fit-content;
+}
+
+/* ── 五线谱 ── */
+.staff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.staffHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.clef {
+  font-family: var(--font-music);
+  font-size: 40px;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.keySig {
+  font-family: var(--font-music);
+  font-size: 24px;
+  color: var(--text-secondary);
+}
+
+.timeSig {
+  font-family: var(--font-music);
+  font-size: 28px;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.measures {
+  display: flex;
+  gap: 0;
+}
+
+.measure {
+  position: relative;
+  min-width: 140px;
+  padding: var(--space-4) var(--space-2);
+  cursor: crosshair;
+  transition: background var(--transition-fast);
+}
+.measure:hover {
+  background: var(--bg-hover);
+}
+.measure:not(:last-child) {
+  border-right: 1px dashed var(--border-muted);
+}
+
+.staffLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.staffLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-staff-line);
+  opacity: 0.6;
+}
+
+.measureContent {
+  position: relative;
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+.note {
+  position: absolute;
+  font-family: var(--font-music);
+  font-size: 28px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.note:hover {
+  color: var(--color-accent);
+}
+
+.noteAccent {
+  color: var(--color-accent);
+}
+
+.barline {
+  position: absolute;
+  right: -1px;
+  top: -16px;
+  bottom: -16px;
+  width: 1.5px;
+  background: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.measureNum {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* ── 批注标记点 ── */
+.annotationMarker {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  z-index: 5;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  pointer-events: auto;
+}
+.annotationMarker:hover {
+  transform: scale(1.2);
+}
+
+.markerOpen {
+  background: var(--color-accent);
+}
+
+.markerResolved {
+  background: var(--color-success-text);
+  opacity: 0.7;
+}
+
+.measureActive {
+  background: var(--color-accent-glow) !important;
+  border-color: var(--color-accent) !important;
+}
+
+/* ── 简谱 ── */
+.jianpu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.jianpuHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.jianpuKey, .jianpuTime, .jianpuTempo {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.jianpuMeasure {
+  min-width: 120px;
+  padding: var(--space-6) var(--space-3);
+  cursor: crosshair;
+  transition: background var(--transition-fast);
+  text-align: center;
+}
+.jianpuMeasure:hover {
+  background: var(--bg-hover);
+}
+.jianpuMeasure:not(:last-child) {
+  border-right: 1px dashed var(--border-muted);
+}
+
+.jianpuNotes {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.jianpuNote {
+  color: var(--text-primary);
+  position: relative;
+}
+.jianpuNote:hover {
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.jianpuHigh {
+  text-decoration: overline;
+}
+
+.jianpuDot::after {
+  content: '•';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+}
+
+/* ── 批注层 ── */
+.annotationLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* ── 播放控制 ── */
+.player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.playerControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.playerBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-primary);
+  background: var(--color-accent);
+  transition: all var(--transition-base);
+}
+.playerBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+.progressBar {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+}
+
+.progressTrack {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: var(--border-default);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.progressTrack:hover {
+  height: 6px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  position: relative;
+}
+
+.progressThumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+.progressTrack:hover .progressThumb {
+  opacity: 1;
+}
+
+.timeDisplay {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  min-width: 80px;
+}
+
+.playerMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tempo, .key {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
