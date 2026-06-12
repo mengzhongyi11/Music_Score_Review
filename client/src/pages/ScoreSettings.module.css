@@ -167,6 +167,16 @@
   border-color: var(--color-accent);
 }
 
+.inviteMsg {
+  flex: 1; font-size: 13px; color: var(--text-secondary);
+  padding: 4px 8px; background: var(--bg-hover); border-radius: var(--radius-sm);
+}
+.inviteMsgInput {
+  flex: 1; height: 32px; padding: 0 10px; font-size: 13px;
+  background: var(--bg-primary); border: 1px solid var(--border-default);
+  border-radius: var(--radius-md); color: var(--text-primary); outline: none;
+}
+
 .deleteInput {
   flex: 1;
   height: 32px;

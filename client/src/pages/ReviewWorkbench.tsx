@@ -25,6 +25,14 @@ export function ReviewWorkbench() {
   const urlScoreId = searchParams.get('scoreId');
   const [selectedScoreId, setSelectedScoreId] = useState<number>(urlScoreId ? Number(urlScoreId) : 1);
   const [selectedSection, setSelectedSection] = useState<SectionRow | null>(null);
+
+  // URL 参数变化时同步 selectedScoreId（修复分支返回后乐谱不匹配）
+  useEffect(() => {
+    if (urlScoreId && Number(urlScoreId) !== selectedScoreId) {
+      setSelectedScoreId(Number(urlScoreId));
+      setSelectedSection(null);
+    }
+  }, [urlScoreId]);
   const [commentInput, setCommentInput] = useState('');
   const [activePanel, setActivePanel] = useState<'comments' | 'tree'>('tree');
 
@@ -32,17 +40,24 @@ export function ReviewWorkbench() {
   const [showBranchPanel, setShowBranchPanel] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
 
-  // 提交审阅
-  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
+  // 审阅历史（仅看板显示用）
+  const [reviewHistory, setReviewHistory] = useState<any[]>([]);
+  const [showReviewHistory, setShowReviewHistory] = useState(false);
+  useEffect(() => {
+    if (selectedScoreId) {
+      import('@/api').then(({ reviewsApi }) =>
+        reviewsApi.getHistory(selectedScoreId).then(setReviewHistory).catch(() => {})
+      );
+    }
+  }, [selectedScoreId]);
 
   // 过滤逻辑
-  const getScoreColumn = (id: number): string => {
-    return ['pending', 'reviewing', 'approved', 'rejected'][id % 4];
+  const getScoreColumn = (s: any): string => {
+    return s.review_status || 'pending';
   };
   const filteredScores = scoresAPI.list.data.filter((s) => {
     if (activeFilter === 'all') return true;
-    return getScoreColumn(s.id) === activeFilter;
+    return getScoreColumn(s) === activeFilter;
   });
 
   useEffect(() => {
@@ -64,17 +79,21 @@ export function ReviewWorkbench() {
   }, [selectedScoreId]);
 
   useEffect(() => {
+    // 切换乐段时先清空批注，防止显示旧数据
     if (selectedSection) {
       commentsAPI.fetchBySection(selectedSection.id);
     }
   }, [selectedSection?.id]);
 
   useEffect(() => {
-    const firstSection = sectionsAPI.tree.data.find((s) => s.type === 'section');
-    if (firstSection && !selectedSection) {
+    // 只选择属于当前选中乐谱的乐段，防止切换路由时读取旧数据
+    const firstSection = sectionsAPI.tree.data.find(
+      (s) => s.type === 'section' && s.score_id === selectedScoreId
+    );
+    if (firstSection && !selectedSection && firstSection.score_id === selectedScoreId) {
       setSelectedSection(firstSection);
     }
-  }, [sectionsAPI.tree.data]);
+  }, [sectionsAPI.tree.data, selectedScoreId]);
 
   // 提交批注
   const handleSubmitComment = useCallback(async () => {
@@ -118,29 +137,14 @@ export function ReviewWorkbench() {
     }
   };
 
-  // 提交审阅
-  const handleSubmitReview = async () => {
-    try {
-      // 模拟创建版本
-      const section = selectedSection;
-      if (section) {
-        await sectionsAPI.updateSection(section.id, {
-          content: section.content || undefined,
-        });
-      }
-      setShowSubmitDialog(false);
-      alert('♩ 审阅已提交！' + (submitMessage ? ` 备注：${submitMessage}` : ''));
-      setSubmitMessage('');
-    } catch (err: any) {
-      alert('提交失败: ' + err.message);
-    }
-  };
+  // (审阅功能移至项目看板)
 
   // 导出 PDF
 
 
   const scores = filteredScores;
-  const comments = commentsAPI.list.data;
+  // 只显示当前乐段的批注，防止切换乐谱时显示旧数据
+  const comments = commentsAPI.list.data.filter(c => c.section_id === selectedSection?.id);
   const currentScore = scoresAPI.list.data.find((s) => s.id === selectedScoreId);
   const openComments = comments.filter((c) => c.status === 'open');
   const resolvedComments = comments.filter((c) => c.status === 'resolved');
@@ -184,7 +188,11 @@ export function ReviewWorkbench() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.2"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M3.5 12.5L5 11M11 5l1.5-1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
             设置
           </button>
-          <button className={styles.submitBtn} onClick={() => setShowSubmitDialog(true)}>提交审阅</button>
+          {reviewHistory.length > 0 && (
+            <button className={styles.shareBtn} onClick={() => setShowReviewHistory(!showReviewHistory)}>
+              📋 审阅记录 ({reviewHistory.length})
+            </button>
+          )}
         </div>
       </div>
 
@@ -206,7 +214,7 @@ export function ReviewWorkbench() {
                 <div key={b.id} className={styles.branchItem}>
                   <span className={styles.branchDot} data-status={b.status} />
                   <span className={styles.branchName}>{b.name}</span>
-                  <Badge variant={b.status === 'active' ? 'reviewing' : b.status === 'merged' ? 'success' : 'default'} label={{ active: '活跃', merged: '已合并', closed: '已关闭' }[b.status] || b.status} />
+                  <Badge variant={b.status === 'active' ? 'working' : b.status === 'merged' ? 'success' : 'default'} label={{ active: '活跃', merged: '已合并', closed: '已关闭' }[b.status] || b.status} />
                   <span className={styles.branchCreator}>{b.created_by_name || '—'}</span>
                 </div>
               ))}
@@ -315,28 +323,35 @@ export function ReviewWorkbench() {
               await commentsAPI.resolveComment(id);
             }}
           />
-          <VersionTimeline sectionId={selectedSection?.id} />
+          <VersionTimeline
+            sectionId={selectedSection?.id}
+            onRollback={async (sid) => {
+              await sectionsAPI.fetchOne(sid);
+              const updated = sectionsAPI.current.data;
+              if (updated) setSelectedSection(updated);
+            }}
+          />
         </div>
       </div>
 
-      {/* 提交审阅对话框 */}
-      {showSubmitDialog && (
-        <div className={styles.overlay} onClick={() => setShowSubmitDialog(false)}>
+      {/* 审阅历史弹窗 */}
+      {showReviewHistory && (
+        <div className={styles.overlay} onClick={() => setShowReviewHistory(false)}>
           <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.dialogTitle}>♩ 提交审阅</h3>
-            <p className={styles.dialogDesc}>
-              将当前乐谱「{currentScore?.name || ''}」的审阅结果提交。这将会创建一个新版本。
-            </p>
-            <textarea
-              className={styles.dialogInput}
-              placeholder="添加审阅备注（可选）..."
-              value={submitMessage}
-              onChange={(e) => setSubmitMessage(e.target.value)}
-              rows={3}
-            />
+            <h3 className={styles.dialogTitle}>📋 审阅记录</h3>
+            {reviewHistory.length === 0 && <p className={styles.dialogDesc}>暂无审阅记录</p>}
+            {reviewHistory.map((r: any) => (
+              <div key={r.id} className={styles.reviewHistoryItem}>
+                <span className={styles.reviewHistoryStatus}>
+                  {r.status === 'approved' ? '✅ 已通过' : '❌ 已驳回'}
+                </span>
+                <span className={styles.reviewHistoryReviewer}>{r.reviewer_name}</span>
+                <span className={styles.reviewHistoryDate}>{new Date(r.created_at).toLocaleDateString('zh-CN')}</span>
+                {r.comment && <p className={styles.reviewHistoryComment}>{r.comment}</p>}
+              </div>
+            ))}
             <div className={styles.dialogActions}>
-              <Button variant="secondary" size="md" onClick={() => setShowSubmitDialog(false)}>取消</Button>
-              <Button variant="primary" size="md" onClick={handleSubmitReview}>确认提交</Button>
+              <Button variant="secondary" size="md" onClick={() => setShowReviewHistory(false)}>关闭</Button>
             </div>
           </div>
         </div>

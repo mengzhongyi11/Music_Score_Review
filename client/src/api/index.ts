@@ -45,8 +45,14 @@ export interface ScoreRow {
   composer: string;
   description: string | null;
   owner_id: number | null;
+  is_public: boolean | number;
+  review_status?: 'pending' | 'working' | 'approved' | 'rejected';
+  reviewed_by?: number | null;
+  review_comment?: string | null;
+  reviewed_at?: string | null;
   owner_name?: string;
   owner_avatar?: string;
+  comment_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -209,7 +215,7 @@ export const scoresApi = {
   get: (id: number) =>
     request<ScoreRow>(`/scores/${id}`),
 
-  create: (data: { name: string; composer: string; description?: string; owner_id?: number }) =>
+  create: (data: { name: string; composer: string; description?: string; owner_id?: number; is_public?: boolean }) =>
     request<{ id: number; message: string }>('/scores', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -272,6 +278,9 @@ export const sectionsApi = {
    ════════════════════════════════ */
 
 export const commentsApi = {
+  getAll: () =>
+    request<any[]>('/comments/by-score'),
+
   getBySection: (sectionId: number) =>
     request<CommentRow[]>(`/comments/section/${sectionId}`),
 
@@ -421,6 +430,81 @@ export const tagsApi = {
 export async function healthCheck(): Promise<{ status: string; message: string }> {
   return request('/health');
 }
+
+/* ════════════════════════════════
+   Reviews（审阅）
+   ════════════════════════════════ */
+
+export interface ReviewRow {
+  id: number;
+  score_id: number;
+  reviewer_id: number;
+  status: 'pending' | 'approved' | 'rejected';
+  comment: string | null;
+  created_at: string;
+  reviewer_name?: string;
+}
+
+export const reviewsApi = {
+  submit: (scoreId: number, data: { status: string; comment?: string; reviewer_id: number }) =>
+    request<{ message: string; reviewId: number }>(`/reviews/${scoreId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getHistory: (scoreId: number) =>
+    request<ReviewRow[]>(`/reviews/${scoreId}`),
+};
+
+/* ════════════════════════════════
+   Invitations（邀请/申请）
+   ════════════════════════════════ */
+
+export interface InvitationRow {
+  id: number;
+  score_id: number;
+  user_id: number;
+  invited_by: number | null;
+  type: 'invite' | 'apply';
+  status: 'pending' | 'accepted' | 'rejected';
+  message: string | null;
+  created_at: string;
+  score_name?: string;
+  inviter_name?: string;
+  user_name?: string;
+}
+
+export const invitationsApi = {
+  getUserInvitations: (userId: number) =>
+    request<InvitationRow[]>(`/invitations/user/${userId}`),
+
+  getScoreApplications: (scoreId: number) =>
+    request<InvitationRow[]>(`/invitations/score/${scoreId}`),
+
+  create: (data: { score_id: number; user_id: number; invited_by?: number; type?: string; message?: string }) =>
+    request<{ id: number; message: string }>('/invitations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  respond: (id: number, status: 'accepted' | 'rejected') =>
+    request<{ message: string }>(`/invitations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    }),
+};
+
+/* ════════════════════════════════
+   Import（MusicXML 导入）
+   ════════════════════════════════ */
+
+export const importApi = {
+  upload: (xml: string, scoreId?: number, userId?: number) =>
+    request<{ message: string; scoreId?: number; branchId?: number; title: string }>('/import', {
+      method: 'POST',
+      body: JSON.stringify({ xml, scoreId, userId }),
+    }),
+};
 
 export default {
   scores: scoresApi,

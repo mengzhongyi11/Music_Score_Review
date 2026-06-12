@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/shared/Button';
 import { Badge } from '@/components/shared/Badge';
 import { Loading, ErrorMessage, EmptyState } from '@/components/shared/Loading';
+import { ImportModal } from '@/components/shared/ImportModal';
 import { useBranchesStore, useScoresStore, useSectionsStore } from '@/api/apiStore';
 import styles from './DiffPage.module.css';
 
@@ -13,6 +14,7 @@ export function DiffPage() {
   const sectionsAPI = useSectionsStore();
 
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
+  const [showImport, setShowImport] = useState(false);
   const [mode, setMode] = useState<PageMode>('list');
   const [mergeResult, setMergeResult] = useState<string | null>(null);
   const [merging, setMerging] = useState(false);
@@ -20,7 +22,14 @@ export function DiffPage() {
 
   // 加载数据
   useEffect(() => { scoresAPI.fetchList(); }, []);
-  const currentScoreId = scoresAPI.list.data[0]?.id || 1;
+  const [currentScoreId, setCurrentScoreId] = useState<number>(1);
+
+  // 数据加载后设置默认乐谱
+  useEffect(() => {
+    if (scoresAPI.list.data.length > 0 && currentScoreId === 1 && !scoresAPI.list.data.find(s => s.id === 1)) {
+      setCurrentScoreId(scoresAPI.list.data[0].id);
+    }
+  }, [scoresAPI.list.data]);
 
   useEffect(() => {
     branchesAPI.fetchByScore(currentScoreId);
@@ -92,13 +101,28 @@ export function DiffPage() {
         <div>
           <h1 className={styles.title}>🎵 分支管理</h1>
           <p className={styles.subtitle}>
-            <span className={styles.versionTag}>{scoresAPI.list.data.find((s) => s.id === currentScoreId)?.name || '乐谱'}</span>
+            <select
+              className={styles.scoreSelect}
+              value={currentScoreId}
+              onChange={(e) => {
+                setCurrentScoreId(Number(e.target.value));
+                setSelectedBranchId(null);
+                setMergeResult(null);
+              }}
+            >
+              {scoresAPI.list.data.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
             <span className={styles.separator}>·</span>
             <strong>{branchesAPI.list.data.length}</strong> 个分支
             · <strong>{activeBranches.length}</strong> 个活跃
           </p>
         </div>
         <div className={styles.headerActions}>
+          <Button variant="ghost" size="md" onClick={() => setShowImport(true)}>
+            📂 导入到分支
+          </Button>
           {selectedBranch && !isMerged && stats.total > 0 && (
             <Button variant="primary" size="md" onClick={handleMerge} loading={merging} disabled={merging}>
               {merging ? '合并中…' : `合并「${selectedBranch.name}」到主库`}
@@ -273,6 +297,18 @@ export function DiffPage() {
           )}
         </div>
       </div>
+
+      {showImport && (
+        <ImportModal
+          onClose={() => setShowImport(false)}
+          onImported={(result) => {
+            setShowImport(false);
+            branchesAPI.fetchByScore(currentScoreId);
+            if (result.branchId) setSelectedBranchId(result.branchId);
+          }}
+          scoreId={currentScoreId}
+        />
+      )}
     </div>
   );
 }

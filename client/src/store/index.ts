@@ -139,8 +139,8 @@ export const useKanbanStore = create<KanbanState>((set) => ({
       { id: 'k1', score: { id: 's1', name: '月光变奏曲', composer: '贝多芬', type: 'staff', createdAt: '', updatedAt: '' }, submitter: { id: 'u2', name: '李四', avatar: '', online: true }, submittedAt: '2024-01-16T10:00:00', annotationCount: 5, status: 'pending' },
       { id: 'k2', score: { id: 's2', name: '胡笳十八拍', composer: '蔡文姬', type: 'staff', createdAt: '', updatedAt: '' }, submitter: { id: 'u3', name: '王五', avatar: '', online: false }, submittedAt: '2024-01-15T14:00:00', annotationCount: 3, status: 'pending' },
     ],
-    reviewing: [
-      { id: 'k3', score: { id: 's3', name: '春江花月夜', composer: '古曲', type: 'jianpu', createdAt: '', updatedAt: '' }, submitter: { id: 'u2', name: '李四', avatar: '', online: true }, submittedAt: '2024-01-15T09:00:00', annotationCount: 12, status: 'reviewing' },
+    working: [
+      { id: 'k3', score: { id: 's3', name: '春江花月夜', composer: '古曲', type: 'jianpu', createdAt: '', updatedAt: '' }, submitter: { id: 'u2', name: '李四', avatar: '', online: true }, submittedAt: '2024-01-15T09:00:00', annotationCount: 12, status: 'working' },
     ],
     approved: [
       { id: 'k4', score: { id: 's4', name: '广陵散', composer: '嵇康', type: 'staff', createdAt: '', updatedAt: '' }, submitter: { id: 'u1', name: '张三', avatar: '', online: true }, submittedAt: '2024-01-14T16:00:00', annotationCount: 3, status: 'approved' },

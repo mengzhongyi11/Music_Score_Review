@@ -13,12 +13,15 @@ import tagsRouter from './routes/tags';
 import dashboardRouter from './routes/dashboard';
 import collaboratorsRouter from './routes/collaborators';
 import authRouter from './routes/auth';
+import importRouter from './routes/import';
+import invitationsRouter from './routes/invitations';
+import reviewsRouter from './routes/reviews';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // 路由
 app.use('/api/scores', scoresRouter);
@@ -34,6 +37,9 @@ app.use('/api/tags', tagsRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/collaborators', collaboratorsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/import', importRouter);
+app.use('/api/invitations', invitationsRouter);
+app.use('/api/reviews', reviewsRouter);
 
 // 健康检查
 app.get('/api/health', (_req, res) => {

@@ -37,7 +37,7 @@ interface ScoresStore {
   fetchList: (params?: { owner_id?: number; tag?: string }) => Promise<void>;
   fetchOne: (id: number) => Promise<void>;
   fetchFullScore: (id: number) => Promise<void>;
-  createScore: (data: { name: string; composer: string; description?: string; owner_id?: number }) => Promise<number>;
+  createScore: (data: { name: string; composer: string; description?: string; owner_id?: number; is_public?: boolean }) => Promise<number>;
   searchScores: (keyword: string) => Promise<void>;
   deleteScore: (id: number) => Promise<void>;
 }

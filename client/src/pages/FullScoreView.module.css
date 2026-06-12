@@ -131,25 +131,59 @@
   letter-spacing: 2px;
 }
 
+.noteWrap {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+.tieOverlay {
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+.tieOverlay path {
+  stroke: var(--color-accent);
+}
 .measure {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  min-width: 60px;
+  padding: 24px 10px 6px;
+  min-width: 80px;
   border-right: 1px dashed var(--border-muted);
 }
-
-.note {
+.measure .note {
   display: inline-block;
   text-align: center;
-  min-width: 20px;
-  font-size: 18px;
+  min-width: 24px;
+  font-size: 22px;
   color: var(--text-primary);
+  position: relative;
+}
+.note sup, .note sub {
+  line-height: 1;
 }
 
 .noteHigh {
-  border-top: 1px solid var(--text-primary);
-  padding-top: 2px;
+  border-top: 2px solid var(--text-primary);
+  padding-top: 3px;
+}
+.noteDHigh {
+  border-top: 4px double var(--text-primary);
+  padding-top: 3px;
+}
+.noteLow {
+  border-bottom: 2px solid var(--text-primary);
+  padding-bottom: 3px;
+}
+
+.rest {
+  font-size: 20px;
+  color: var(--text-tertiary);
+}
+
+.tie {
+  font-size: 16px;
+  color: var(--text-tertiary);
 }
 
 .barline {
@@ -159,15 +193,21 @@
 }
 
 .staffHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--text-secondary);
   margin-bottom: var(--space-3);
-  padding: 4px 8px;
+  padding: 6px 12px;
   background: var(--bg-hover);
   border-radius: var(--radius-sm);
-  display: inline-block;
 }
+
+.headerKey { font-weight: 700; color: var(--text-primary); font-size: 16px; }
+.headerTime { font-weight: 700; color: var(--text-primary); font-size: 16px; }
+.headerTempo { color: var(--text-tertiary); margin-left: auto; }
 
 .textSection {
   padding: var(--space-3) 0;
@@ -211,27 +251,68 @@
     display: none !important;
   }
 
-  /* 重置页面边距 */
-  body, html {
+  /* 重置页面边距 — 占满整页 */
+  html, body, #root, .page, .scoreContent, [class*='layout'], [class*='container'] {
     margin: 0 !important;
     padding: 0 !important;
-    background: white !important;
-  }
-
-  /* 主内容区占满全屏 */
-  .page {
     max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    background: white !important;
     animation: none !important;
-  }
-
-  .scoreContent {
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    padding: 20px !important;
-    background: white !important;
+  }
+
+  .page {
+    padding: 12px !important;
+  }
+
+  .scoreContent {
+    padding: 0 !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+  }
+
+  .section {
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* VexFlow 五线谱 SVG 缩放适应页面 */
+  [data-measure] svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .staffRows {
+    flex-wrap: wrap !important;
+    font-size: 14px !important;
+  }
+
+  .measure {
+    flex-shrink: 0 !important;
+    padding: 20px 8px 4px !important;
+  }
+
+  /* 隐藏导航和工具栏 */
+  nav, aside, .nav, .sidebar, .topNav, [class*='nav'], [class*='sidebar'],
+  .toolbar {
+    display: none !important;
+  }
+
+  .cover {
+    padding: 20px 0 !important;
+    margin-bottom: 16px !important;
+  }
+  .coverTitle { font-size: 22px !important; }
+  .coverComposer { font-size: 14px !important; }
+  .coverDesc { font-size: 12px !important; }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   * {

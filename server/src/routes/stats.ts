@@ -64,7 +64,7 @@ router.get('/', async (req: Request, res: Response) => {
       pendingReviews: (pendingReviews as any[])[0].count,
       activeBranches: (activeBranches as any[])[0].count,
       totalSections: (totalSections as any[])[0].count,
-      todayEdits: (todayEdits as any[])[0].count,
+      todayEdits: (todayEdits as any[])[0]?.count || 0,
     });
   } catch (err) {
     console.error('查询统计失败:', err);
