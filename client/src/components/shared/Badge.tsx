@@ -5,7 +5,7 @@ type BadgeVariant = ReviewStatus | AnnotationStatus | 'default' | 'info' | 'warn
 
 const variantMap: Record<string, { className: string; label: string }> = {
   pending:    { className: 'badgeWarning', label: '待审阅' },
-  reviewing:  { className: 'badgeInfo',    label: '审阅中' },
+  working:    { className: 'badgeInfo',    label: '工作中' },
   approved:   { className: 'badgeSuccess', label: '已通过' },
   rejected:   { className: 'badgeDanger',  label: '已驳回' },
   awaiting_reply: { className: 'badgeWarning', label: '待回复' },

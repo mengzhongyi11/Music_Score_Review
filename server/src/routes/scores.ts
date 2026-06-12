@@ -7,7 +7,8 @@ const router = Router();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { owner_id, tag } = req.query;
-    let query = `SELECT DISTINCT s.*, u.name as owner_name, u.avatar as owner_avatar
+    let query = `SELECT DISTINCT s.*, u.name as owner_name, u.avatar as owner_avatar,
+                  (SELECT COUNT(*) FROM comments c JOIN sections sec ON c.section_id = sec.id WHERE sec.score_id = s.id) as comment_count
                  FROM scores s
                  LEFT JOIN users u ON s.owner_id = u.id`;
     const params: any[] = [];
@@ -22,6 +23,8 @@ router.get('/', async (req: Request, res: Response) => {
       conditions.push('s.owner_id = ?');
       params.push(Number(owner_id));
     }
+    // 已通过/已驳回的超过一周自动隐藏
+    conditions.push("(s.review_status NOT IN ('approved','rejected') OR s.reviewed_at IS NULL OR s.reviewed_at >= NOW() - INTERVAL 7 DAY)");
     if (conditions.length > 0) {
       query += ' WHERE ' + conditions.join(' AND ');
     }
@@ -58,13 +61,13 @@ router.get('/:id', async (req: Request, res: Response) => {
 // 创建乐谱
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, composer, description, owner_id } = req.body;
+    const { name, composer, description, owner_id, is_public } = req.body;
     if (!name || !composer) {
       return res.status(400).json({ message: '乐谱名称和作曲者不能为空' });
     }
     const [result] = await pool.query(
-      'INSERT INTO scores (name, composer, description, owner_id) VALUES (?, ?, ?, ?)',
-      [name, composer, description || null, owner_id || null]
+      'INSERT INTO scores (name, composer, description, owner_id, is_public) VALUES (?, ?, ?, ?, ?)',
+      [name, composer, description || null, owner_id || null, is_public ? 1 : 0]
     );
     const insertResult = result as any;
     res.status(201).json({ id: insertResult.insertId, message: '乐谱创建成功' });

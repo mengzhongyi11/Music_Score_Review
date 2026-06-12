@@ -11,408 +11,409 @@
 }
 
 .emptyState {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12);
-  gap: var(--space-4);
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: var(--space-12); gap: var(--space-4);
 }
+.emptyIcon { font-size: 48px; opacity: 0.4; }
+.emptyText { font-size: 15px; color: var(--text-tertiary); }
 
-.emptyIcon {
-  font-size: 48px;
-  opacity: 0.4;
-}
-
-.emptyText {
-  font-size: 15px;
-  color: var(--text-tertiary);
-}
-
-/* ── 工具栏 ── */
+/* ── Toolbar ── */
 .toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border-default); flex-shrink: 0;
+}
+.toolbarRight { display: flex; align-items: center; gap: var(--space-3); }
+.sectionInfo { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+/* ── 头部 ── */
+.scoreHeader {
+  display: flex; align-items: center; gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-muted);
+  font-family: var(--font-mono), var(--font-sans);
+}
+.shKey { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.shTime { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+.shTempo { margin-left: auto; font-size: 18px; color: var(--text-secondary); }
+
+/* ── 滚动区 ── */
+.scrollArea { flex: 1; overflow: auto; padding: var(--space-4); }
+.staffSystem { min-width: fit-content; }
+
+/* ═══════════════════════════════
+   简谱
+   ═══════════════════════════════ */
+.jianpuSection { display: flex; }
+.jpRows { display: flex; flex-wrap: wrap; padding: var(--space-4) 0; }
+
+.jpMeasure {
+  position: relative; display: flex; align-items: center; gap: var(--space-2);
+  padding: 28px 16px; min-width: 80px; cursor: crosshair;
+  transition: background var(--transition-fast);
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+}
+.jpMeasure:hover { background: var(--bg-hover); border-color: var(--border-muted); }
+
+.jpNotesRow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 32px; font-weight: 700;
+  font-family: var(--font-mono), 'Noto Sans SC', sans-serif;
+  line-height: 1.8; letter-spacing: 1px;
 }
 
-.toolbarActions {
-  display: flex;
-  gap: 4px;
+.jpNote {
+  position: relative; display: inline-flex; align-items: center;
+  justify-content: center; color: var(--text-primary);
+}
+.jpHigh { border-top: 2px solid var(--text-primary); padding-top: 3px; margin-top: -3px; }
+.jpDHigh { border-top: 4px double var(--text-primary); padding-top: 3px; margin-top: -3px; }
+.jpLow { border-bottom: 2px solid var(--text-primary); padding-bottom: 3px; margin-bottom: -3px; }
+.jpShort { font-size: 26px; }
+.jpRest { color: var(--text-tertiary); font-size: 28px; }
+
+.jpOctaveUp {
+  position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+  font-size: 22px; color: var(--text-primary); font-weight: 700;
+  line-height: 1; letter-spacing: 2px;
+}
+.jpOctaveDown {
+  position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%);
+  font-size: 22px; color: var(--text-primary); font-weight: 700;
+  line-height: 1; letter-spacing: 2px;
 }
 
-.toolBtn {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  transition: all var(--transition-base);
+/* 断音样式由子元素 .jpStaccDot 处理 */
+.jpStaccDot {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  font-size: 18px; color: var(--text-primary);
 }
-.toolBtn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+.jpAccentMark {
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-size: 22px; color: var(--text-primary); font-weight: 700;
+}
+.jpTenutoMark {
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 16px; color: var(--text-primary); width: 24px; text-align: center;
+}
+.jpDotMark {
+  position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+  font-size: 18px; color: var(--text-primary);
+}
+.jpFermataMark {
+  position: absolute; top: -34px; left: 50%; transform: translateX(-50%);
+  font-size: 28px; color: var(--text-primary); font-family: var(--font-music), serif;
+}
+.jpDyn {
+  position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+  font-size: 16px; color: var(--color-accent); font-weight: 500;
+  font-family: var(--font-sans); letter-spacing: 0; white-space: nowrap;
+}
+.jpBarline { color: var(--text-tertiary); font-size: 36px; margin-left: 8px; flex-shrink: 0; }
+.jpBeats {
+  position: absolute; top: -16px; left: 6px;
+  font-size: 14px; color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+.jpTieEnd {
+  position: absolute; top: 6px; left: 2%;
+  width: 120px; height: 28px;
+  border: 3px solid transparent;
+  border-top-color: var(--text-link);
+  border-radius: 80% 80% 0 0;
+  opacity: 0.85; z-index: 10; pointer-events: none;
+}
+.jpTieStart {
+  position: absolute; bottom: 6px; right: 2%;
+  width: 120px; height: 28px;
+  border: 3px solid transparent;
+  border-bottom-color: var(--text-link);
+  border-radius: 0 0 80% 80%;
+  opacity: 0.85; z-index: 10; pointer-events: none;
 }
 
-/* ── 协作光标层 ── */
-.cursorLayer {
+/* 拍组分隔（标准11.5.2.3b：单位拍呈现要分明） */
+.jpBeatSep {
+  display: inline-block;
+  width: 6px;
+  flex-shrink: 0;
+}
+
+/* 简谱小节内同音连线 — 水平弧线（标准7.10：连线记在音符上方） */
+.jpInnerTie {
   position: absolute;
-  inset: 0;
+  left: 50%; top: 0px;
+  width: 80px; height: 28px;
+  border: 3px solid transparent;
+  border-top-color: var(--text-link);
+  border-radius: 80% 80% 0 0;
+  opacity: 0.85;
   pointer-events: none;
-  z-index: 20;
+  z-index: 2;
+  transform: translateX(-50%);
 }
 
-.cursor {
-  position: absolute;
-  z-index: 20;
+/* ═══════════════════════════════
+   五线谱
+   ═══════════════════════════════ */
+.staffSection {
+  display: flex; align-items: flex-start;
+  padding-top: var(--space-2);
+}
+
+.clefSign {
+  font-family: 'Noto Music', 'Bravura', var(--font-music), serif;
+  font-size: 96px; line-height: 1; color: var(--text-primary);
+  padding-top: 30px; flex-shrink: 0; min-width: 70px; text-align: center;
+}
+
+/* 连谱号 — 系统起始括号 */
+.systemBracket {
+  position: relative; flex-shrink: 0;
+  width: 24px; margin-right: 4px;
+  align-self: stretch;
+}
+.systemBracket::before {
+  content: '';
+  position: absolute; top: 48px; bottom: 48px; left: 10px;
+  width: 3px; background: var(--text-primary); opacity: 0.65;
+}
+.systemBracket::after {
+  content: '';
+  position: absolute; top: 48px; left: 10px;
+  width: 16px; height: 12px;
+  border-top: 3px solid var(--text-primary);
+  border-left: 3px solid var(--text-primary);
+  opacity: 0.65;
+}
+/* 底部小勾 */
+.systemBracketBottom {
+  position: absolute; bottom: 48px; left: 10px;
+  width: 16px; height: 12px;
+  border-bottom: 3px solid var(--text-primary);
+  border-left: 3px solid var(--text-primary);
+  opacity: 0.65;
   pointer-events: none;
-  transition: left 100ms ease-out, top 100ms ease-out;
 }
 
-.cursor svg {
-  display: block;
+.sfRows { display: flex; flex: 1; flex-wrap: wrap; gap: 12px 0; }
+
+.sfMeasure {
+  position: relative; min-width: 180px; height: 320px;
+  cursor: crosshair; transition: background var(--transition-fast);
+  border-right: 1.5px solid var(--border-muted); padding: 0 10px;
+}
+.sfMeasure:hover { background: var(--bg-hover); }
+
+.sfLines {
+  position: absolute; top: 44px; bottom: 44px; left: 0; right: 0;
+  pointer-events: none;
+}
+.sfLine {
+  position: absolute; left: 0; right: 0; height: 1.5px;
+  background: var(--color-staff-line); opacity: 0.8;
 }
 
-.cursorLabel {
+.sfNotesArea {
+  display: flex; align-items: stretch;
+  position: absolute; top: 44px; bottom: 44px; left: 0; right: 0;
+  pointer-events: none;
+}
+
+.sfNoteWrap {
+  position: relative; width: 96px; flex-shrink: 0; height: 100%;
+  pointer-events: auto;
+}
+
+.sfNoteHead {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-family: 'Noto Music', 'Bravura', var(--font-music), serif;
+  font-size: 80px; color: var(--text-primary);
+  transition: color var(--transition-fast);
+  z-index: 2; line-height: 1;
+}
+.sfNoteHead:hover { color: var(--color-accent); }
+
+/* 符干 — 按标准规则绘制（符头在第三线以上朝下，以下朝上） */
+.sfStem {
   position: absolute;
-  top: 14px;
-  left: 6px;
-  font-size: 10px;
-  color: #fff;
-  padding: 1px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  font-weight: 500;
+  width: 4px;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--text-primary);
+  border-radius: 2px;
+}
+.sfStemDown {
+  /* 符头在第三线及以上：符干从符头右侧向上延伸 */
+  left: 62%;
+  height: 130px;
+}
+.sfStemUp {
+  /* 符头在第三线以下：符干从符头左侧向下延伸 */
+  right: 62%;
+  height: 130px;
 }
 
-/* ── 乐谱滚动区 ── */
-.scrollArea {
-  flex: 1;
-  overflow: auto;
-  padding: var(--space-6) var(--space-4);
+.sfLedger {
+  position: absolute; left: -14px; right: -14px; height: 1.5px;
+  background: var(--color-staff-line); opacity: 0.6;
+  transform: translateY(-50%);
 }
 
-.staffSystem {
-  min-width: fit-content;
-}
-
-/* ── 五线谱 ── */
-.staff {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.staffHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.clef {
-  font-family: var(--font-music);
-  font-size: 40px;
-  color: var(--text-primary);
+.sfRest {
+  position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
+  font-family: 'Noto Music', 'Bravura', var(--font-music), serif;
+  font-size: 72px; color: var(--text-secondary);
   line-height: 1;
 }
 
-.keySig {
-  font-family: var(--font-music);
-  font-size: 24px;
-  color: var(--text-secondary);
-}
+.sfTie { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; color: var(--text-tertiary); }
 
-.timeSig {
-  font-family: var(--font-music);
-  font-size: 28px;
-  color: var(--text-primary);
-  line-height: 1.1;
+.sfBarline {
+  position: absolute; right: 0; top: 44px; bottom: 44px;
+  width: 2px; background: var(--text-tertiary); opacity: 0.45;
 }
-
-.measures {
-  display: flex;
-  gap: 0;
-}
-
-.measure {
-  position: relative;
-  min-width: 140px;
-  padding: var(--space-4) var(--space-2);
-  cursor: crosshair;
-  transition: background var(--transition-fast);
-}
-.measure:hover {
-  background: var(--bg-hover);
-}
-.measure:not(:last-child) {
-  border-right: 1px dashed var(--border-muted);
-}
-
-.staffLines {
-  position: absolute;
-  inset: 0;
+.sfMeasureNum {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  font-size: 13px; color: var(--text-tertiary); font-family: var(--font-mono);
   pointer-events: none;
 }
 
-.staffLine {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--color-staff-line);
-  opacity: 0.6;
+/* 五线谱记号 */
+.sfStaccato {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 28px; color: var(--text-primary); z-index: 3;
+}
+.sfAccent {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 32px; color: var(--text-primary); font-weight: 700; z-index: 3;
+}
+.sfTenuto {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 22px; color: var(--text-primary); z-index: 3;
+}
+.sfOctave {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 28px; color: var(--text-primary); z-index: 3;
+}
+.sfOctaveDown {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 28px; color: var(--text-primary); z-index: 3;
+}
+.sfDot {
+  position: absolute; font-size: 28px; color: var(--text-primary); z-index: 3;
+}
+.sfFermata {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-family: 'Noto Music', 'Bravura', var(--font-music), serif;
+  font-size: 40px; color: var(--text-primary); z-index: 3;
+}
+.sfDyn {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 16px; color: var(--color-accent); font-weight: 500;
+  font-family: var(--font-sans); white-space: nowrap; z-index: 3;
 }
 
-.measureContent {
-  position: relative;
-  height: 100px;
-  display: flex;
-  align-items: center;
+/* 五线谱跨越连接弧线 — 按标准水平放置的平滑弧线 */
+.sfTieArcEnd {
+  position: absolute; top: 10px;
+  width: 100px; height: 30px;
+  border: 3px solid transparent;
+  border-top-color: var(--text-link);
+  border-radius: 80% 80% 0 0;
+  opacity: 0.85; z-index: 4; pointer-events: none;
+}
+.sfTieArcStart {
+  position: absolute; bottom: 10px; right: 0;
+  width: 100px; height: 30px;
+  border: 3px solid transparent;
+  border-bottom-color: var(--text-link);
+  border-radius: 0 0 80% 80%;
+  opacity: 0.85; z-index: 4; pointer-events: none;
 }
 
-.note {
-  position: absolute;
-  font-family: var(--font-music);
-  font-size: 28px;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-.note:hover {
-  color: var(--color-accent);
-}
-
-.noteAccent {
-  color: var(--color-accent);
+/* 小节内同音连线弧线（两个音符之间）— 水平弧线 */
+.sfInnerTie {
+  position: relative; top: 50px; flex-shrink: 0; align-self: flex-start;
+  width: 80px; height: 28px;
+  border: 3px solid transparent;
+  border-top-color: var(--text-link);
+  border-radius: 80% 80% 0 0;
+  opacity: 0.85; z-index: 4; pointer-events: none;
+  margin: 0 -10px;
 }
 
-.barline {
-  position: absolute;
-  right: -1px;
-  top: -16px;
-  bottom: -16px;
-  width: 1.5px;
-  background: var(--text-secondary);
-  opacity: 0.5;
+/* 圆滑线（连音线） */
+.sfSlur {
+  position: relative; top: 60px; flex-shrink: 0; align-self: flex-start;
+  width: 90px; height: 32px;
+  border: 2.5px solid transparent;
+  border-top-color: var(--text-link);
+  border-radius: 80% 80% 0 0;
+  opacity: 0.7; z-index: 4; pointer-events: none;
+  margin: 0 -10px;
 }
 
-.measureNum {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
+/* ── VexFlow 渲染容器 ── */
+.vfContainer {
+  width: 100%;
+  min-height: 200px;
 }
-
-/* ── 批注标记点 ── */
-.annotationMarker {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-  z-index: 5;
-  transition: all var(--transition-fast);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  pointer-events: auto;
+.vfContainer svg {
+  display: block;
 }
-.annotationMarker:hover {
-  transform: scale(1.2);
-}
-
-.markerOpen {
-  background: var(--color-accent);
-}
-
-.markerResolved {
-  background: var(--color-success-text);
-  opacity: 0.7;
-}
-
-.measureActive {
-  background: var(--color-accent-glow) !important;
-  border-color: var(--color-accent) !important;
-}
-
-/* ── 简谱 ── */
-.jianpu {
-  display: flex;
+.sfMeasureBox {
+  display: inline-flex;
   flex-direction: column;
-  gap: var(--space-4);
-}
-
-.jianpuHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: 0 var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.jianpuKey, .jianpuTime, .jianpuTempo {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.jianpuMeasure {
-  min-width: 120px;
-  padding: var(--space-6) var(--space-3);
+  align-items: stretch;
+  vertical-align: top;
   cursor: crosshair;
-  transition: background var(--transition-fast);
-  text-align: center;
-}
-.jianpuMeasure:hover {
-  background: var(--bg-hover);
-}
-.jianpuMeasure:not(:last-child) {
-  border-right: 1px dashed var(--border-muted);
+  border-right: 1px solid var(--border-muted);
 }
 
-.jianpuNotes {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-3);
-  font-size: 24px;
-  font-weight: 600;
+@media print {
+  .sfMeasureBox {
+    flex-shrink: 1 !important;
+  }
+  .sfMeasureBox svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
 }
 
-.jianpuNote {
-  color: var(--text-primary);
-  position: relative;
-}
-.jianpuNote:hover {
-  color: var(--color-accent);
-  cursor: pointer;
-}
-
-.jianpuHigh {
-  text-decoration: overline;
-}
-
-.jianpuDot::after {
-  content: '•';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 8px;
-}
-
-/* ── 批注层 ── */
-.annotationLayer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 15;
+/* ── 批注标记 ── */
+.marker {
+  position: absolute; top: -2px; right: -2px;
+  font-size: 14px; color: var(--color-accent);
+  filter: drop-shadow(0 0 4px var(--color-accent-glow));
+  pointer-events: none; z-index: 5;
 }
 
 /* ── 播放控制 ── */
 .player {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
   padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--border-default);
-  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default); background: var(--bg-surface); flex-shrink: 0;
 }
-
-.playerControls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex: 1;
-}
-
+.playerControls { display: flex; align-items: center; gap: var(--space-3); flex: 1; }
 .playerBtn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--text-primary);
-  background: var(--color-accent);
-  transition: all var(--transition-base);
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; color: #fff; background: var(--color-accent); transition: all var(--transition-base);
 }
-.playerBtn:hover {
-  background: var(--color-accent-hover);
-}
-
-.progressBar {
-  flex: 1;
-  max-width: 400px;
-  display: flex;
-  align-items: center;
-}
-
+.playerBtn:hover { background: var(--color-accent-hover); }
+.progressBar { flex: 1; max-width: 400px; display: flex; align-items: center; }
 .progressTrack {
-  position: relative;
-  width: 100%;
-  height: 4px;
-  background: var(--border-default);
-  border-radius: 2px;
-  cursor: pointer;
+  position: relative; width: 100%; height: 4px;
+  background: var(--border-default); border-radius: 2px; cursor: pointer;
 }
-.progressTrack:hover {
-  height: 6px;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--color-accent);
-  border-radius: 2px;
-  position: relative;
-}
-
+.progressTrack:hover { height: 6px; }
+.progressFill { height: 100%; background: var(--color-accent); border-radius: 2px; }
 .progressThumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border: 2px solid var(--color-accent);
-  border-radius: 50%;
-  box-shadow: var(--shadow-sm);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 12px; height: 12px; background: #fff;
+  border: 2px solid var(--color-accent); border-radius: 50%;
+  opacity: 0; transition: opacity var(--transition-fast);
 }
-.progressTrack:hover .progressThumb {
-  opacity: 1;
-}
-
-.timeDisplay {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  min-width: 80px;
-}
-
-.playerMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.tempo, .key {
-  font-size: 12px;
-  color: var(--text-tertiary);
-}
+.progressTrack:hover .progressThumb { opacity: 1; }
+.timeDisplay { font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); min-width: 80px; }
+.playerMeta { display: flex; align-items: center; gap: var(--space-3); font-size: 12px; color: var(--text-tertiary); }

@@ -12,6 +12,7 @@ export function CreateScoreModal({ onClose, onCreated }: CreateScoreModalProps) 
   const [name, setName] = useState('');
   const [composer, setComposer] = useState('');
   const [description, setDescription] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -23,6 +24,7 @@ export function CreateScoreModal({ onClose, onCreated }: CreateScoreModalProps) 
         composer: composer.trim(),
         description: description.trim() || undefined,
         owner_id: 1,
+        is_public: isPublic,
       });
       onCreated(id);
       onClose();
@@ -67,8 +69,25 @@ export function CreateScoreModal({ onClose, onCreated }: CreateScoreModalProps) 
               placeholder="可选：添加乐谱说明..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
+              rows={2}
             />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>可见性</label>
+            <div className={styles.toggleRow}>
+              <button
+                className={`${styles.toggleBtn} ${!isPublic ? styles.toggleActive : ''}`}
+                onClick={() => setIsPublic(false)}
+              >
+                私密
+              </button>
+              <button
+                className={`${styles.toggleBtn} ${isPublic ? styles.toggleActive : ''}`}
+                onClick={() => setIsPublic(true)}
+              >
+                公开
+              </button>
+            </div>
           </div>
         </div>
         <div className={styles.footer}>

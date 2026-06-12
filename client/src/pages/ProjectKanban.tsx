@@ -1,40 +1,35 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/shared/Badge';
 import { Button } from '@/components/shared/Button';
-import { Loading, ErrorMessage, EmptyState } from '@/components/shared/Loading';
+import { Loading, ErrorMessage } from '@/components/shared/Loading';
 import { CreateScoreModal } from '@/components/shared/CreateScoreModal';
+import { ImportModal } from '@/components/shared/ImportModal';
 import { useScoresStore, useDashboardStore } from '@/api/apiStore';
+import { commentsApi, reviewsApi } from '@/api';
 import type { ScoreRow } from '@/api';
-import type { ReviewStatus } from '@/types';
 import styles from './ProjectKanban.module.css';
 
-/* 定义阶段对应的状态 */
-type ColumnKey = 'pending' | 'reviewing' | 'approved' | 'rejected';
+type ColumnKey = 'pending' | 'approved' | 'working' | 'rejected';
 
 const columns: { key: ColumnKey; label: string; color: string }[] = [
   { key: 'pending',   label: '待审阅', color: 'var(--color-warning)' },
-  { key: 'reviewing', label: '审阅中', color: '#58A6FF' },
   { key: 'approved',  label: '已通过', color: 'var(--color-success-text)' },
+  { key: 'working',   label: '工作中', color: '#58A6FF' },
   { key: 'rejected',  label: '已驳回', color: 'var(--color-danger-text)' },
 ];
 
-/* 把乐谱按 ID 哈希分配到不同列（稳定分配） */
-function getColumnForScore(id: number): ColumnKey {
-  const idx = id % 4;
-  return columns[idx].key;
-}
-
-/* 更新乐谱所在的列（用 localStorage 持久化用户的手动调整） */
-function loadOverrides(): Record<number, ColumnKey> {
-  try {
-    return JSON.parse(localStorage.getItem('kanban_overrides') || '{}');
-  } catch { return {}; }
-}
-function saveOverride(scoreId: number, col: ColumnKey) {
-  const overrides = loadOverrides();
-  overrides[scoreId] = col;
-  localStorage.setItem('kanban_overrides', JSON.stringify(overrides));
+/* 按 review_status 标签自动分配列（可重复出现在多列） */
+function getColumnsForScore(score: ScoreRow): ColumnKey[] {
+  const cols: ColumnKey[] = [];
+  const st = score.review_status || 'approved';
+  if (st === 'rejected') { cols.push('rejected'); return cols; }
+  // 有批注 → 出现在待审阅
+  if ((score.comment_count ?? 0) > 0) cols.push('pending');
+  // 通过/无批注 → 出现在已通过
+  if (st === 'approved' || (score.comment_count ?? 0) === 0) cols.push('approved');
+  // 工作中（有未解决批注且状态为working）
+  if (st === 'working') cols.push('working');
+  return cols.length > 0 ? cols : ['approved'];
 }
 
 export function ProjectKanban() {
@@ -43,71 +38,39 @@ export function ProjectKanban() {
   const { stats, fetchStats } = useDashboardStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [localColumns, setLocalColumns] = useState<Record<ColumnKey, ScoreRow[]>>({
-    pending: [], reviewing: [], approved: [], rejected: [],
-  });
-  const [dragOverCol, setDragOverCol] = useState<ColumnKey | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [annotations, setAnnotations] = useState<any[]>([]);
+  const [reviewTarget, setReviewTarget] = useState<{ scoreId: number; name: string } | null>(null);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewing, setReviewing] = useState(false);
 
-  // 首次加载
   useEffect(() => {
     scoresAPI.fetchList();
     fetchStats();
+    // 加载所有批注
+    commentsApi.getAll().then(setAnnotations).catch(() => {});
   }, []);
-
-  // 当 scores 数据变化时，分配到列
-  useEffect(() => {
-    const overrides = loadOverrides();
-    const cols: Record<ColumnKey, ScoreRow[]> = {
-      pending: [], reviewing: [], approved: [], rejected: [],
-    };
-    scoresAPI.list.data.forEach((s) => {
-      const col = overrides[s.id] || getColumnForScore(s.id);
-      cols[col].push(s);
-    });
-    setLocalColumns(cols);
-  }, [scoresAPI.list.data]);
 
   // 搜索过滤
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchQuery(val);
-    if (val.trim()) {
-      scoresAPI.searchScores(val.trim());
-    } else {
-      scoresAPI.fetchList();
-    }
+    if (val.trim()) scoresAPI.searchScores(val.trim());
+    else scoresAPI.fetchList();
   }, []);
 
-  // 拖拽处理
-  const handleDragStart = (e: React.DragEvent, scoreId: number, fromCol: ColumnKey) => {
-    e.dataTransfer.setData('text/plain', JSON.stringify({ scoreId, fromCol }));
-    (e.currentTarget as HTMLElement).style.opacity = '0.5';
-  };
-  const handleDragEnd = (e: React.DragEvent) => {
-    (e.currentTarget as HTMLElement).style.opacity = '1';
-  };
-  const handleDragOver = (e: React.DragEvent, col: ColumnKey) => {
-    e.preventDefault();
-    setDragOverCol(col);
-  };
-  const handleDragLeave = () => setDragOverCol(null);
-  const handleDrop = (e: React.DragEvent, toCol: ColumnKey) => {
-    e.preventDefault();
-    setDragOverCol(null);
+  const handleReview = async (status: 'approved' | 'rejected') => {
+    if (!reviewTarget) return;
+    setReviewing(true);
     try {
-      const { scoreId, fromCol } = JSON.parse(e.dataTransfer.getData('text/plain'));
-      if (fromCol === toCol) return;
-      // 从原列移除
-      const fromScores = [...localColumns[fromCol as ColumnKey]];
-      const movedScore = fromScores.find((s) => s.id === scoreId);
-      if (!movedScore) return;
-      saveOverride(scoreId, toCol);
-      setLocalColumns((prev) => ({
-        ...prev,
-        [fromCol]: prev[fromCol as ColumnKey].filter((s) => s.id !== scoreId),
-        [toCol]: [...prev[toCol], movedScore],
-      }));
-    } catch {}
+      await reviewsApi.submit(reviewTarget.scoreId, { status, comment: reviewComment || undefined, reviewer_id: 1 });
+      setReviewTarget(null);
+      setReviewComment('');
+      scoresAPI.fetchList();
+      alert(status === 'approved' ? '♩ 已通过' : '已驳回');
+    } catch (err: any) {
+      alert('操作失败: ' + err.message);
+    } finally { setReviewing(false); }
   };
 
   const isLoading = scoresAPI.list.loading && scoresAPI.list.data.length === 0;
@@ -125,6 +88,7 @@ export function ProjectKanban() {
         </div>
         <div className={styles.headerActions}>
           <Button variant="secondary" size="md" onClick={() => setShowCreateModal(true)}>新建项目</Button>
+          <Button variant="ghost" size="md" onClick={() => setShowImportModal(true)}>📂 导入 MusicXML</Button>
           <Button variant="primary" size="md">邀请成员</Button>
         </div>
       </div>
@@ -147,64 +111,87 @@ export function ProjectKanban() {
       {isLoading && <Loading text="加载乐谱列表…" />}
       {scoresAPI.list.error && <ErrorMessage message={scoresAPI.list.error} onRetry={() => scoresAPI.fetchList()} />}
 
-      {/* Kanban 列 */}
-      {!isLoading && !scoresAPI.list.error && (
+      {/* 空库提示 */}
+      {!isLoading && !scoresAPI.list.error && scoresAPI.list.data.length === 0 && (
+        <div className={styles.emptyLibrary}>
+          <div className={styles.emptyLibIcon}>🎵</div>
+          <h2 className={styles.emptyLibTitle}>还没有乐谱</h2>
+          <p className={styles.emptyLibDesc}>创建新乐谱或导入 MusicXML 文件</p>
+          <div className={styles.emptyLibActions}>
+            <Button variant="primary" size="md" onClick={() => setShowCreateModal(true)}>新建乐谱</Button>
+            <Button variant="secondary" size="md" onClick={() => setShowImportModal(true)}>📂 导入 MusicXML</Button>
+          </div>
+        </div>
+      )}
+
+      {/* Kanban 列 — 每条批注为一张卡片 */}
+      {!isLoading && !scoresAPI.list.error && scoresAPI.list.data.length > 0 && (
         <div className={styles.kanban}>
           {columns.map((col) => {
-            const cards = localColumns[col.key] || [];
+            let cards: { id: string; scoreId: number; name: string; content: string; date: string }[] = [];
+
+            if (col.key === 'rejected') {
+              // 驳回：只显示状态为 rejected 的乐谱名
+              cards = scoresAPI.list.data
+                .filter((s) => s.review_status === 'rejected')
+                .map((s) => ({ id: `r-${s.id}`, scoreId: s.id, name: s.name, content: '已驳回', date: '' }));
+            } else if (col.key === 'working') {
+              // 工作中：有未解决批注的乐谱（已通过或工作中）
+              const workingScoreIds = new Set(
+                annotations.filter((a) => a.status === 'open' && a.review_status !== 'rejected').map((a) => a.score_id)
+              );
+              cards = scoresAPI.list.data
+                .filter((s) => workingScoreIds.has(s.id))
+                .map((s) => ({ id: `w-${s.id}`, scoreId: s.id, name: s.name, content: '工作中', date: '' }));
+            } else if (col.key === 'pending') {
+              // 待审阅：每个未解决的批注一张卡片 + 审阅按钮
+              cards = annotations
+                .filter((a) => a.status === 'open' && a.review_status !== 'approved')
+                .map((a) => ({
+                  id: `a-${a.id}`,
+                  scoreId: a.score_id,
+                  name: a.score_name,
+                  content: a.content,
+                  date: new Date(a.created_at).toLocaleDateString('zh-CN'),
+                }));
+            } else {
+              // 已通过：无批注或全部解决的乐谱
+              cards = scoresAPI.list.data
+                .filter((s) => (s.comment_count ?? 0) === 0 || s.review_status === 'approved')
+                .map((s) => ({ id: `ap-${s.id}`, scoreId: s.id, name: s.name, content: '✓ 已通过', date: '' }));
+            }
+
             return (
-              <div
-                key={col.key}
-                className={`${styles.column} ${dragOverCol === col.key ? styles.columnDragOver : ''}`}
-                onDragOver={(e) => handleDragOver(e, col.key)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, col.key)}
-              >
+              <div key={col.key} className={styles.column}>
                 <div className={styles.columnHeader}>
                   <span className={styles.columnDot} style={{ background: col.color }} />
                   <span className={styles.columnTitle}>{col.label}</span>
                   <span className={styles.columnCount}>{cards.length}</span>
                 </div>
                 <div className={styles.cardList}>
-                  {cards.map((score) => (
+                  {cards.map((card) => (
                     <div
-                      key={score.id}
-                      className={styles.card}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, score.id, col.key)}
-                      onDragEnd={handleDragEnd}
-                      onClick={() => navigate(`/review?scoreId=${score.id}`)}
+                      key={card.id}
+                      className={`${styles.card} ${col.key === 'pending' ? styles.cardPending : ''}`}
+                      onClick={() => navigate(`/review?scoreId=${card.scoreId}`)}
                     >
-                      <div className={styles.cardThumb}>
-                        <span className={styles.thumbIcon}>𝄞</span>
-                      </div>
                       <div className={styles.cardBody}>
-                        <h3 className={styles.cardTitle}>{score.name}</h3>
-                        <div className={styles.cardMeta}>
-                          <span>{score.owner_name || score.composer}</span>
-                          <span className={styles.metaDot}>·</span>
-                          <span>{new Date(score.updated_at).toLocaleDateString('zh-CN')}</span>
-                        </div>
+                        <h3 className={styles.cardTitle}>{card.name}</h3>
+                        <p className={styles.cardAnnotation}>{card.content}</p>
                         <div className={styles.cardFooter}>
-                          <span className={styles.annotationBadge}>
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2.5a.5.5 0 01.5-.5h7a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H6l-2 2v-2H2.5a.5.5 0 01-.5-.5v-5z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/></svg>
-                            {score.description ? score.description.length % 10 : 0}
-                          </span>
-                          <Badge variant={getColumnForScore(score.id) as ReviewStatus} />
-                          <button
-                            className={styles.cardSettingsBtn}
-                            onClick={(e) => { e.stopPropagation(); navigate(`/settings/${score.id}`); }}
-                            title="设置"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2M2.5 2.5l1.5 1.5M10 10l1.5 1.5M2.5 11.5L4 10M10 4l1.5-1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                          </button>
+                          {card.date && <span className={styles.metaText}>{card.date}</span>}
+                          {col.key === 'pending' && (
+                            <button className={styles.reviewBtn} onClick={(e) => { e.stopPropagation(); setReviewTarget({ scoreId: card.scoreId, name: card.name }); }}>
+                              审阅
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))}
                   {cards.length === 0 && (
                     <div className={styles.emptyColumn}>
-                      <span className={styles.emptyText}>拖拽乐谱到此处</span>
+                      <span className={styles.emptyText}>无</span>
                     </div>
                   )}
                 </div>
@@ -218,6 +205,35 @@ export function ProjectKanban() {
         <CreateScoreModal
           onClose={() => setShowCreateModal(false)}
           onCreated={(id) => navigate(`/review?scoreId=${id}`)}
+        />
+      )}
+
+      {/* 审阅对话框 */}
+      {reviewTarget && (
+        <div className={styles.overlay} onClick={() => setReviewTarget(null)}>
+          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.dialogTitle}>♩ 审阅乐谱</h3>
+            <p className={styles.dialogDesc}>对「{reviewTarget.name}」做出审阅结论</p>
+            <textarea className={styles.dialogInput} placeholder="审阅意见（可选）…" value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} rows={3} />
+            <div className={styles.dialogActions}>
+              <Button variant="secondary" size="md" onClick={() => setReviewTarget(null)}>取消</Button>
+              <Button variant="danger" size="md" onClick={() => handleReview('rejected')} loading={reviewing} disabled={reviewing}>❌ 驳回</Button>
+              <Button variant="primary" size="md" onClick={() => handleReview('approved')} loading={reviewing} disabled={reviewing}>✅ 通过</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showImportModal && (
+        <ImportModal
+          scores={scoresAPI.list.data}
+          onClose={() => setShowImportModal(false)}
+          onImported={(result) => {
+            setShowImportModal(false);
+            scoresAPI.fetchList();
+            if (result.branchId) navigate(`/diff`);
+            else if (result.scoreId) navigate(`/review?scoreId=${result.scoreId}`);
+          }}
         />
       )}
     </div>

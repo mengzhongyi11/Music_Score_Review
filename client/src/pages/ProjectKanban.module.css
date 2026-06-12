@@ -94,6 +94,21 @@
   font-weight: 500;
 }
 
+/* ── 空库 ── */
+.emptyLibrary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  min-height: 300px;
+}
+.emptyLibIcon { font-size: 64px; margin-bottom: var(--space-4); }
+.emptyLibTitle { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-2); }
+.emptyLibDesc { font-size: 14px; color: var(--text-tertiary); margin-bottom: var(--space-6); }
+.emptyLibActions { display: flex; gap: var(--space-3); }
+
 /* ── Kanban ── */
 .kanban {
   display: grid;
@@ -108,7 +123,8 @@
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-height: 0;
+  overflow: clip;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -148,12 +164,17 @@
 }
 
 .cardList {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
-  padding: var(--space-3);
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 8px;
+}
+
+.cardList > * {
+  flex-shrink: 0;
 }
 
 .card {
@@ -173,44 +194,24 @@
   cursor: grabbing;
 }
 
-.cardThumb {
-  height: 80px;
-  background: var(--bg-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-.cardThumb::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 8px,
-    rgba(139, 134, 128, 0.08) 8px,
-    rgba(139, 134, 128, 0.08) 9px
-  );
-}
-
-.thumbIcon {
-  font-family: var(--font-music);
-  font-size: 28px;
-  color: var(--text-tertiary);
-  z-index: 1;
-}
-
 .cardBody {
-  padding: var(--space-3);
+  padding: 12px;
 }
 
 .cardTitle {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-1);
+  margin-bottom: 4px;
+}
+.cardAnnotation {
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.4; margin-bottom: 4px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.metaText {
+  font-size: 11px; color: var(--text-tertiary);
 }
 
 .cardMeta {
@@ -219,7 +220,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: var(--space-2);
+  margin-bottom: 6px;
 }
 
 .metaDot {
@@ -273,3 +274,38 @@
   font-size: 13px;
   color: var(--text-tertiary);
 }
+
+/* ── 待审阅卡片高亮 + 审阅按钮 ── */
+.cardPending {
+  border-left: 3px solid var(--color-warning);
+}
+.reviewBtn {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: var(--radius-sm);
+  background: var(--color-accent); color: #fff;
+  flex-shrink: 0; transition: opacity var(--transition-fast);
+}
+.reviewBtn:hover { opacity: 0.85; }
+
+/* ── 审阅对话框 ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.dialog {
+  background: var(--bg-surface); border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg); padding: var(--space-6);
+  max-width: 420px; width: 90%; box-shadow: var(--shadow-lg);
+}
+.dialogTitle { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-2); }
+.dialogDesc { font-size: 13px; color: var(--text-tertiary); margin-bottom: var(--space-4); }
+.dialogInput {
+  width: 100%; padding: 10px 12px; font-size: 14px;
+  background: var(--bg-primary); border: 1px solid var(--border-default);
+  border-radius: var(--radius-md); color: var(--text-primary);
+  resize: vertical; font-family: inherit; outline: none;
+  margin-bottom: var(--space-4); box-sizing: border-box;
+}
+.dialogActions { display: flex; justify-content: flex-end; gap: var(--space-3); }

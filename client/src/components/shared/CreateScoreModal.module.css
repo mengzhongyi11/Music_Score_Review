@@ -148,3 +148,27 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.toggleRow {
+  display: flex;
+  gap: var(--space-2);
+}
+.toggleBtn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  transition: all var(--transition-fast);
+}
+.toggleBtn:hover {
+  border-color: var(--text-tertiary);
+}
+.toggleActive {
+  border-color: var(--color-accent);
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+  font-weight: 500;
+}

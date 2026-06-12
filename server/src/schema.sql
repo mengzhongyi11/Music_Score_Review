@@ -25,6 +25,11 @@ CREATE TABLE IF NOT EXISTS scores (
   composer VARCHAR(100) NOT NULL COMMENT '作曲者',
   description TEXT COMMENT '描述',
   owner_id INT COMMENT '创建者/库主',
+  is_public BOOLEAN DEFAULT FALSE COMMENT '是否公开',
+  review_status ENUM('pending','working','approved','rejected') DEFAULT 'pending' COMMENT '审阅状态',
+  reviewed_by INT COMMENT '审阅人',
+  review_comment TEXT COMMENT '审阅意见',
+  reviewed_at TIMESTAMP NULL COMMENT '审阅时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL
@@ -42,6 +47,34 @@ CREATE TABLE IF NOT EXISTS score_collaborators (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_by) REFERENCES users(id) ON DELETE SET NULL,
   UNIQUE KEY uk_score_user (score_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 邀请/申请记录表
+CREATE TABLE IF NOT EXISTS invitations (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  score_id INT NOT NULL COMMENT '乐谱 ID',
+  user_id INT NOT NULL COMMENT '目标用户',
+  invited_by INT COMMENT '邀请人（申请时为空）',
+  type ENUM('invite','apply') DEFAULT 'invite' COMMENT 'invite=邀请 apply=申请',
+  status ENUM('pending','accepted','rejected') DEFAULT 'pending' COMMENT '待处理/已同意/已拒绝',
+  message TEXT COMMENT '附言',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (score_id) REFERENCES scores(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (invited_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 审阅记录表
+CREATE TABLE IF NOT EXISTS reviews (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  score_id INT NOT NULL COMMENT '乐谱 ID',
+  reviewer_id INT NOT NULL COMMENT '审阅人',
+  status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending' COMMENT '审阅结果',
+  comment TEXT COMMENT '审阅意见',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (score_id) REFERENCES scores(id) ON DELETE CASCADE,
+  FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 乐段表（自引用树形结构）

@@ -1,6 +1,6 @@
 /* ── 核心类型定义 ── */
 
-export type ReviewStatus = 'pending' | 'reviewing' | 'approved' | 'rejected';
+export type ReviewStatus = 'pending' | 'working' | 'approved' | 'rejected';
 
 export type ScoreType = 'staff' | 'jianpu';
 

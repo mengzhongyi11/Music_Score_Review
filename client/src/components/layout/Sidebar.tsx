@@ -5,12 +5,12 @@ import { useScoresStore, useCommentsStore, useUsersStore, useDashboardStore } fr
 import { collaboratorsApi } from '@/api';
 import styles from './Sidebar.module.css';
 
-export type FilterValue = 'all' | 'pending' | 'reviewing' | 'approved' | 'rejected';
+export type FilterValue = 'all' | 'pending' | 'working' | 'approved' | 'rejected';
 
 const filterConfig = [
   { value: 'pending' as FilterValue,   label: '待审阅', color: 'var(--color-warning)' },
-  { value: 'reviewing' as FilterValue, label: '审阅中', color: '#58A6FF' },
   { value: 'approved' as FilterValue,  label: '已通过',  color: 'var(--color-success-text)' },
+  { value: 'working' as FilterValue,   label: '工作中',  color: '#58A6FF' },
   { value: 'rejected' as FilterValue,  label: '已驳回',  color: 'var(--color-danger-text)' },
 ];
 
@@ -46,23 +46,23 @@ export function Sidebar() {
     }
   }, [scoresAPI.list.data]);
 
-  // 按分数 ID 分配状态（与看板一致的算法）
-  const getColumnForScore = (id: number): FilterValue => {
-    const idx = id % 4;
-    return filterConfig[idx].value;
+  // 按审阅状态分配
+  const getStatus = (s: any): FilterValue => {
+    const st = s.review_status || 'approved';
+    return (['pending', 'working', 'approved', 'rejected'].includes(st) ? st : 'approved') as FilterValue;
   };
 
   // 筛选计数
   const totalScores = scoresAPI.list.data.length;
-  const pendingCount = scoresAPI.list.data.filter((s) => getColumnForScore(s.id) === 'pending').length;
-  const reviewingCount = scoresAPI.list.data.filter((s) => getColumnForScore(s.id) === 'reviewing').length;
-  const approvedCount = scoresAPI.list.data.filter((s) => getColumnForScore(s.id) === 'approved').length;
-  const rejectedCount = scoresAPI.list.data.filter((s) => getColumnForScore(s.id) === 'rejected').length;
+  const pendingCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'pending').length;
+  const workingCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'working').length;
+  const approvedCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'approved').length;
+  const rejectedCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'rejected').length;
 
   const filterCounts: Record<FilterValue, number> = {
     all: totalScores,
     pending: pendingCount,
-    reviewing: reviewingCount,
+    working: workingCount,
     approved: approvedCount,
     rejected: rejectedCount,
   };
