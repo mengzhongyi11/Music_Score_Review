@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 export function TopNav() {
-  const { unreadCount, notifications, markRead } = useNotificationStore();
+  const { unreadCount, notifications, loading, markRead, markAllRead, fetchList } = useNotificationStore();
   const { collapsed, toggleCollapsed } = useSidebarStore();
   const { theme, toggleTheme } = useThemeStore();
   const usersAPI = useUsersStore();
@@ -76,7 +76,7 @@ export function TopNav() {
       <div className={styles.right}>
         {/* 通知铃铛 */}
         <div className={styles.notifWrapper} ref={notifRef}>
-          <button className={styles.iconBtn} onClick={() => { setShowNotifPanel(!showNotifPanel); setShowUserMenu(false); }} aria-label="通知">
+          <button className={styles.iconBtn} onClick={() => { setShowNotifPanel(!showNotifPanel); setShowUserMenu(false); if (!showNotifPanel) fetchList(); }} aria-label="通知">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M9 1.5a5.5 5.5 0 00-5.5 5.5v3.5L2 12.5v1h14v-1l-1.5-2V7A5.5 5.5 0 009 1.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
               <path d="M6.5 13.5a2.5 2.5 0 005 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -90,29 +90,32 @@ export function TopNav() {
               <div className={styles.notifPanelHeader}>
                 <span className={styles.notifPanelTitle}>通知</span>
                 <span className={styles.notifPanelCount}>{notifications.length}</span>
+                <button className={styles.notifMarkAllBtn} onClick={() => markAllRead()} title="全部已读">✓ 全部已读</button>
               </div>
+              {/* 面板打开时自动刷新已由全局轮询处理 */}
               <div className={styles.notifList}>
                 {notifications.length === 0 && (
                   <div className={styles.notifEmpty}>暂无通知</div>
                 )}
-                {notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={`${styles.notifItem} ${!n.read ? styles.notifUnread : ''}`}
-                    onClick={() => { markRead(n.id); }}
-                  >
-                    <div className={styles.notifType}>
-                      {n.type === 'annotation' ? '🎵' : n.type === 'review' ? '🎶' : '♪'}
+                {notifications.map((n) => {
+                  const typeIcon = { merge: '🔀', review: '🎶', member_join: '👤', invite: '📨', invite_rejected: '❌' }[n.type] || '♪';
+                  return (
+                    <div
+                      key={n.id}
+                      className={`${styles.notifItem} ${!n.is_read ? styles.notifUnread : ''}`}
+                      onClick={() => { markRead(n.id); }}
+                    >
+                      <div className={styles.notifType}>{typeIcon}</div>
+                      <div className={styles.notifBody}>
+                        <p className={styles.notifMsg}>{n.message}</p>
+                        <span className={styles.notifTime}>
+                          {new Date(n.created_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      {!n.is_read && <span className={styles.notifUnreadDot} />}
                     </div>
-                    <div className={styles.notifBody}>
-                      <p className={styles.notifMsg}>{n.message}</p>
-                      <span className={styles.notifTime}>
-                        {new Date(n.createdAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    {!n.read && <span className={styles.notifUnreadDot} />}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -156,7 +159,7 @@ export function TopNav() {
                   <span className={styles.userStatLbl}>用户</span>
                 </div>
                 <div className={styles.userStat}>
-                  <span className={styles.userStatVal}>{notifications.filter((n) => !n.read).length}</span>
+                  <span className={styles.userStatVal}>{notifications.filter((n) => !n.is_read).length}</span>
                   <span className={styles.userStatLbl}>未读</span>
                 </div>
               </div>

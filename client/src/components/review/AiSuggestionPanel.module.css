@@ -1,0 +1,148 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-default);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+  padding: 0 7px;
+  border-radius: 8px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border-muted);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tab:hover { background: var(--bg-hover); color: var(--text-primary); }
+.tabActive { background: var(--color-accent-glow); color: var(--color-accent); font-weight: 600; }
+
+/* ── List ── */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* ── Card ── */
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  transition: box-shadow var(--transition-fast);
+}
+.card:hover { box-shadow: var(--shadow-sm); }
+.cardDone { opacity: 0.6; }
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.layerTag {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.statusPending {
+  font-size: 11px;
+  color: var(--color-warning-text);
+  font-weight: 500;
+}
+.statusAccepted { font-size: 11px; color: var(--color-success-text); font-weight: 500; }
+.statusRejected { font-size: 11px; color: var(--color-danger-text); font-weight: 500; }
+.statusDismissed { font-size: 11px; color: var(--text-tertiary); }
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.cardContent {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-2);
+}
+
+.reasonBox {
+  margin-bottom: var(--space-2);
+}
+
+.reasonSummary {
+  font-size: 11px;
+  color: var(--color-accent);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.reasonText {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  padding: var(--space-2);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-1);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-muted);
+}

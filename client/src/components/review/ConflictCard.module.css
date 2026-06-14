@@ -1,0 +1,143 @@
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typeTag {
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+/* 检测来源标签 */
+.sourceTag {
+  font-size: 10px;
+  color: #8B949E;
+  background: #1C2128;
+  border: 1px solid #30363D;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+[data-theme='light'] .sourceTag {
+  color: #656D76;
+  background: #F6F8FA;
+  border-color: #D0D7DE;
+}
+
+.sectionName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.branchValue {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* 系统检测详情 */
+.detailBox {
+  padding: var(--space-2);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+}
+.detailLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+.location {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  display: block;
+  margin-bottom: 2px;
+}
+.detailDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 值对比 */
+.compare {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-2);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+}
+.compareCol { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.compareLabel {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+.compareVal {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+.vsArrow { flex-shrink: 0; color: var(--text-tertiary); }
+
+/* AI 建议 */
+.suggestionBox {
+  padding: var(--space-2);
+  background: var(--color-accent-glow);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+}
+.suggestionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: 2px;
+}
+.suggestionText {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-muted);
+}

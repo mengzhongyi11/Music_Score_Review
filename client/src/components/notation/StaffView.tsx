@@ -3,7 +3,7 @@ import { useReviewStore } from '@/store';
 import { ScoreTypeSwitcher } from '@/components/shared/ScoreTypeSwitcher';
 import { AnnotationModal } from '@/components/annotation/AnnotationModal';
 import { parseJianpu, noteToDisplay, noteGlyph, computeMeasureTies } from '@/utils/notation';
-import type { NoteToken, ParsedScore } from '@/utils/notation';
+import type { NoteToken, ChordSubNote, ParsedScore } from '@/utils/notation';
 import type { SectionRow, CommentRow } from '@/api';
 import { VexflowStaff } from './VexflowStaff';
 import { PlayerBar } from './PlayerBar';
@@ -18,6 +18,10 @@ interface StaffViewProps {
 
 /* ── 渲染简谱单个音符（标准6.2.5/5.12.2.3a：按时值占位） ── */
 function JianpuNote({ note }: { note: NoteToken }) {
+  if (note.isChord && note.chordNotes && note.chordNotes.length > 1) {
+    return <JianpuChordNote note={note} />;
+  }
+
   const display = noteToDisplay(note);
   const glyph = noteGlyph(note);
   // 时长比例（附点 ×1.5）：全=4 二分=2 四分=1 八分=0.5...
@@ -43,6 +47,41 @@ function JianpuNote({ note }: { note: NoteToken }) {
       {/* 延长号 */}
       {note.fermata && <span className={styles.jpFermataMark}>𝅭</span>}
       {/* 力度 */}
+      {note.dynamics && <sup className={styles.jpDyn}>{note.dynamics}</sup>}
+    </span>
+  );
+}
+
+/* ── 渲染简谱和弦（纵向叠排） ── */
+function JianpuChordNote({ note }: { note: NoteToken }) {
+  const durRatio = (4 / note.duration) * (note.isDot ? 1.5 : 1);
+  const noteWidth = Math.max(28 * durRatio, 28);
+  // 按音高从高到低排列（高八度优先）
+  const sorted = [...(note.chordNotes || [])].sort((a, b) => {
+    const aVal = a.octaveDots * 10 + parseInt(a.pitch);
+    const bVal = b.octaveDots * 10 + parseInt(b.pitch);
+    return bVal - aVal;
+  });
+
+  return (
+    <span className={`${styles.jpNote} ${styles.jpChord} ${note.isDot ? styles.jpDot : ''} ${note.isStaccato ? styles.jpStaccato : ''} ${note.isAccent ? styles.jpAccent : ''} ${note.duration >= 8 ? styles.jpShort : ''} ${note.fermata ? styles.jpFermata : ''}`}
+      style={{ minWidth: `${noteWidth}px`, verticalAlign: 'middle' }}>
+      <span className={styles.jpChordStack}>
+        {sorted.map((cn, i) => (
+          <span key={i} className={styles.jpChordNote}>
+            {cn.accidental === '#' && <span className={styles.jpChordAcc}>#</span>}
+            {cn.accidental === 'b' && <span className={styles.jpChordAcc}>b</span>}
+            {cn.pitch}
+            {cn.octaveDots > 0 && <sup className={styles.jpChordOctave}>{'˙'.repeat(cn.octaveDots)}</sup>}
+            {cn.octaveDots < 0 && <sub className={styles.jpChordOctave}>{'˙'.repeat(Math.abs(cn.octaveDots))}</sub>}
+          </span>
+        ))}
+      </span>
+      {note.isStaccato && <span className={styles.jpStaccDot}>·</span>}
+      {note.isAccent && <span className={styles.jpAccentMark}>{'>'}</span>}
+      {note.isTenuto && <span className={styles.jpTenutoMark}>—</span>}
+      {note.isDot && <span className={styles.jpDotMark}>•</span>}
+      {note.fermata && <span className={styles.jpFermataMark}>𝅭</span>}
       {note.dynamics && <sup className={styles.jpDyn}>{note.dynamics}</sup>}
     </span>
   );

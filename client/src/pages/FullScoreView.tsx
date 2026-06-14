@@ -76,6 +76,29 @@ function JianpuStaff({ content, label }: { content: string; label: string }) {
             {m.notes.map((n, ni) => {
               if (n.isRest) return <span key={ni} className={styles.rest}>0</span>;
               if (n.isExtension) return <span key={ni} className={styles.tie}>—</span>;
+
+              // 和弦渲染
+              if (n.isChord && n.chordNotes && n.chordNotes.length > 1) {
+                const sorted = [...n.chordNotes].sort((a, b) => {
+                  const aV = a.octaveDots * 10 + parseInt(a.pitch);
+                  const bV = b.octaveDots * 10 + parseInt(b.pitch);
+                  return bV - aV;
+                });
+                return (
+                  <span key={ni} className={styles.noteWrap} style={{ minWidth: `${layouts[ni].w}px`, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', verticalAlign: 'middle' }}>
+                    {sorted.map((cn, ci) => (
+                      <span key={ci} className={styles.chordNote}>
+                        {cn.accidental === '#' && <span className={styles.chordAcc}>#</span>}
+                        {cn.accidental === 'b' && <span className={styles.chordAcc}>b</span>}
+                        {cn.pitch}
+                        {cn.octaveDots > 0 && <sup className={styles.chordOctave}>{'˙'.repeat(cn.octaveDots)}</sup>}
+                        {cn.octaveDots < 0 && <sub className={styles.chordOctave}>{'˙'.repeat(Math.abs(cn.octaveDots))}</sub>}
+                      </span>
+                    ))}
+                  </span>
+                );
+              }
+
               let txt = '';
               if (n.accidental === '#') txt += '#';
               else if (n.accidental === 'b') txt += 'b';

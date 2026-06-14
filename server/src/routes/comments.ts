@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db';
+import { analyzeSubmission, saveSuggestion } from '../services/aiReviewService';
 
 const router = Router();
 
@@ -21,7 +22,7 @@ router.get('/section/:sectionId', async (req: Request, res: Response) => {
   }
 });
 
-// 新增评论（关联用户）
+// 新增评论（关联用户）—— 先 AI 过滤，再写入
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { section_id, user_id, content, measure_ref } = req.body;
@@ -35,6 +36,43 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ message: '用户不存在' });
     }
     const user = userList[0];
+
+    // 先查乐谱 ID
+    const [secRows] = await pool.query('SELECT score_id FROM sections WHERE id = ?', [section_id]);
+    const scoreId = ((secRows as any[])[0]?.score_id);
+
+    // ==== AI 预审：先运行三层过滤 ====
+    let aiSuggestion: any = null;
+    if (scoreId) {
+      try {
+        const result = await analyzeSubmission({
+          scoreId,
+          sectionId: section_id,
+          content,
+          title: `批注分析：${content.slice(0, 30)}${content.length > 30 ? '…' : ''}`,
+          userId: user_id,
+        });
+
+        // 规则层或 RAG 层驳回 → 拦截，不创建批注
+        if (result.suggestionType === 'auto_reject') {
+          return res.status(400).json({
+            message: `AI 过滤已拦截：${result.reason}`,
+            filtered: true,
+            ai_suggestion: { id: null, ...result },
+          });
+        }
+
+        // 通过预审 → 保存建议供后续查看（含 RAG 上下文）
+        const sugId = await saveSuggestion(
+          { scoreId, sectionId: section_id, content, title: `批注分析：${content.slice(0, 30)}${content.length > 30 ? '…' : ''}`, userId: user_id },
+          result,
+          result.ragContext,
+        );
+        aiSuggestion = { id: sugId, ...result };
+      } catch { /* AI 分析失败不阻塞 */ }
+    }
+
+    // ==== 通过 AI 预审，正式创建批注 ====
     const [result] = await pool.query(
       'INSERT INTO comments (section_id, user_id, author, content, status, measure_ref) VALUES (?, ?, ?, ?, ?, ?)',
       [section_id, user_id, user.name, content, 'open', measure_ref || null]
@@ -47,7 +85,7 @@ router.post('/', async (req: Request, res: Response) => {
       [section_id]
     );
 
-    // 返回完整评论数据
+    // 返回完整评论数据（含 AI 初审结果）
     res.status(201).json({
       id: insertResult.insertId,
       section_id,
@@ -61,6 +99,7 @@ router.post('/', async (req: Request, res: Response) => {
       measure_ref: measure_ref || null,
       created_at: new Date().toISOString(),
       message: '评论发表成功',
+      ai_suggestion: aiSuggestion,
     });
   } catch (err) {
     console.error('新增评论失败:', err);

@@ -90,6 +90,14 @@ export interface CommentRow {
   // 来自 JOIN 的扩展字段
   user_role?: string;
   user_title?: string;
+  // AI 初审结果（新评论创建时返回）
+  ai_suggestion?: {
+    id: number;
+    suggestionType: 'auto_accept' | 'auto_reject' | 'discuss' | 'info';
+    priority: 'P0' | 'P1' | 'P2';
+    layer: 'rule' | 'rag' | 'ai';
+    reason: string;
+  } | null;
 }
 
 export interface UserRow {
@@ -358,9 +366,10 @@ export const branchesApi = {
   getDiff: (branchId: number) =>
     request<{ branch: BranchRow; diffs: BranchOverrideRow[] }>(`/branches/${branchId}/diff`),
 
-  merge: (branchId: number) =>
+  merge: (branchId: number, actorId?: number) =>
     request<{ message: string; mergedCount: number }>(`/branches/${branchId}/merge`, {
       method: 'POST',
+      body: JSON.stringify({ actor_id: actorId || 1 }),
     }),
 
   updateStatus: (branchId: number, status: string) =>
@@ -492,6 +501,187 @@ export const invitationsApi = {
       method: 'PUT',
       body: JSON.stringify({ status }),
     }),
+};
+
+/* ════════════════════════════════
+   AI 审阅
+   ════════════════════════════════ */
+
+export interface ReviewSuggestionRow {
+  id: number;
+  score_id: number;
+  branch_id: number | null;
+  section_id: number | null;
+  layer: 'rule' | 'rag' | 'ai';
+  suggestion_type: 'auto_accept' | 'auto_reject' | 'discuss' | 'info';
+  priority: 'P0' | 'P1' | 'P2';
+  title: string;
+  content: string | null;
+  reason: string | null;
+  rag_context: string | null;
+  status: 'pending' | 'accepted' | 'rejected' | 'dismissed';
+  created_by: number | null;
+  reviewed_by: number | null;
+  reviewed_by_name?: string;
+  reviewed_at: string | null;
+  created_at: string;
+}
+
+export const aiReviewApi = {
+  analyze: (data: { score_id: number; section_id?: number; branch_id?: number; content: string; title?: string; user_id?: number }) =>
+    request<{ suggestion: ReviewSuggestionRow & { id: number } }>('/ai-review/analyze', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  analyzeBranch: (branchId: number, userId?: number) =>
+    request<{ suggestions: (ReviewSuggestionRow & { section_name?: string })[] }>(`/ai-review/branch/${branchId}`, {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId }),
+    }),
+
+  getSuggestions: (scoreId: number, params?: { status?: string; priority?: string }) =>
+    request<{ suggestions: ReviewSuggestionRow[] }>(`/ai-review/suggestions/${scoreId}`, {
+      params: params as any,
+    }),
+
+  updateStatus: (id: number, status: string, reviewedBy?: number) =>
+    request<{ message: string }>(`/ai-review/suggestions/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, reviewed_by: reviewedBy }),
+    }),
+};
+
+/* ── 通知类型 ── */
+export interface NotificationRow {
+  id: number;
+  user_id: number;
+  type: 'merge' | 'review' | 'member_join' | 'invite' | 'invite_rejected';
+  score_id: number | null;
+  actor_id: number | null;
+  actor_name?: string;
+  score_name?: string;
+  message: string;
+  is_read: boolean | number;
+  created_at: string;
+}
+
+/* ════════════════════════════════
+   Notifications（通知）
+   ════════════════════════════════ */
+
+export const notificationsApi = {
+  list: (userId: number) =>
+    request<NotificationRow[]>(`/notifications/${userId}`),
+
+  unreadCount: (userId: number) =>
+    request<{ count: number }>(`/notifications/${userId}/unread-count`),
+
+  markRead: (id: number) =>
+    request<{ message: string }>(`/notifications/${id}/read`, { method: 'PUT' }),
+
+  markAllRead: (userId: number) =>
+    request<{ message: string }>(`/notifications/read-all/${userId}`, { method: 'PUT' }),
+};
+
+/* ════════════════════════════════
+   Merge（冲突检测）
+   ════════════════════════════════ */
+
+export interface ConflictRow {
+  id: number;
+  branch_id: number;
+  score_id: number;
+  section_id: number;
+  section_name?: string;
+  conflict_type: 'note_content' | 'tempo' | 'key_signature' | 'time_signature' | 'metadata';
+  conflict_detail: string | null;
+  merge_suggestion: string | null;
+  mainValue?: string;
+  branchValue?: string;
+  measureIndex?: number;
+  noteIndex?: number;
+  status: string;
+  created_at: string;
+}
+
+export const mergeApi = {
+  getConflicts: (branchId: number) =>
+    request<{ conflicts: ConflictRow[]; summary: { total: number; noteConflicts: number; otherConflicts: number } }>(`/merge/conflicts/${branchId}`),
+
+  resolveConflict: (id: number, data: { resolution: 'accept_main' | 'accept_branch' | 'custom'; custom_content?: string; resolved_by?: number }) =>
+    request<{ message: string }>(`/merge/conflicts/${id}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+/* ════════════════════════════════
+   Impact（影响分析）
+   ════════════════════════════════ */
+
+export interface ImpactItem {
+  type: string;
+  severity: 'high' | 'medium' | 'low';
+  description: string;
+  suggestion: string;
+}
+
+export interface ImpactResult {
+  sectionId: string;
+  sectionName: string;
+  overallRisk: 'high' | 'medium' | 'low';
+  impacts: ImpactItem[];
+}
+
+export const impactApi = {
+  analyzeSection: (data: { score_id: number; section_name?: string; new_content: string; old_content?: string }) =>
+    request<{ analysis: ImpactResult }>('/impact/analyze-section', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  analyzeBranch: (branchId: number) =>
+    request<{ analyses: ImpactResult[] }>(`/impact/analyze-branch/${branchId}`, {
+      method: 'POST',
+    }),
+
+  getSummary: (scoreId: number) =>
+    request<{ summary: { high: number; medium: number; low: number; total: number } }>(`/impact/summary/${scoreId}`),
+};
+
+/* ════════════════════════════════
+   Preferences（偏好学习）
+   ════════════════════════════════ */
+
+export interface ReviewStatsData {
+  stats: {
+    totalProcessed: number;
+    acceptanceRate: number;
+    rejectionRate: number;
+    aiAccuracy: number;
+  };
+  preferences: any[];
+}
+
+export const preferencesApi = {
+  getStats: (userId: number) =>
+    request<ReviewStatsData>(`/preferences/${userId}/stats`),
+
+  updatePreferences: (userId: number, preferences: { key: string; value: any; weight?: number }[]) =>
+    request<{ message: string }>(`/preferences/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ preferences }),
+    }),
+
+  checkReject: (content: string, userId?: number) =>
+    request<{ matched: boolean; patterns: string[] }>('/preferences/check-reject', {
+      method: 'POST',
+      body: JSON.stringify({ content, user_id: userId }),
+    }),
+
+  getGlobalStats: () =>
+    request<{ globalStats: any }>('/preferences/ai-stats'),
 };
 
 /* ════════════════════════════════

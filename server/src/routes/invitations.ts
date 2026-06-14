@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db';
+import { createNotification } from './notifications';
 
 const router = Router();
 
@@ -70,6 +71,18 @@ router.post('/', async (req: Request, res: Response) => {
       'INSERT INTO invitations (score_id, user_id, invited_by, type, message) VALUES (?, ?, ?, ?, ?)',
       [score_id, user_id, invited_by || null, type || 'invite', message || null]
     );
+
+    // 邀请通知：通知被邀请人
+    if (type !== 'apply' && invited_by) {
+      try {
+        const [sRows] = await pool.query('SELECT name FROM scores WHERE id = ?', [score_id]);
+        const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [invited_by]);
+        const scoreName = (sRows as any[])[0]?.name || '乐谱';
+        const inviterName = (uRows as any[])[0]?.name || '用户';
+        await createNotification({ userId: user_id, type: 'invite', scoreId: score_id, actorId: invited_by, message: `${inviterName} 邀请你协作「${scoreName}」` });
+      } catch (_) {}
+    }
+
     res.status(201).json({ id: (result as any).insertId, message: type === 'apply' ? '已提交申请' : '已发送邀请' });
   } catch (err) {
     console.error('创建邀请失败:', err);
@@ -105,6 +118,28 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
 
       await connection.commit();
+
+      // 加入/拒绝通知
+      try {
+        const [sRows] = await pool.query('SELECT name, owner_id FROM scores WHERE id = ?', [inv.score_id]);
+        const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [inv.user_id]);
+        const scoreInfo = (sRows as any[])[0];
+        const userName = (uRows as any[])[0]?.name || '用户';
+        if (status === 'accepted') {
+          const msg = `${userName} 已加入「${scoreInfo?.name}」协作`;
+          // 通知乐谱主人
+          if (scoreInfo?.owner_id && scoreInfo.owner_id !== inv.user_id) {
+            await createNotification({ userId: scoreInfo.owner_id, type: 'member_join', scoreId: inv.score_id, actorId: inv.user_id, message: msg });
+          }
+          // 通知邀请人
+          if (inv.invited_by && inv.invited_by !== inv.user_id && inv.invited_by !== scoreInfo?.owner_id) {
+            await createNotification({ userId: inv.invited_by, type: 'member_join', scoreId: inv.score_id, actorId: inv.user_id, message: msg });
+          }
+        } else if (status === 'rejected' && inv.invited_by) {
+          await createNotification({ userId: inv.invited_by, type: 'invite_rejected', scoreId: inv.score_id, actorId: inv.user_id, message: `${userName} 拒绝了你的协作邀请` });
+        }
+      } catch (_) {}
+
       res.json({ message: status === 'accepted' ? '已同意' : '已拒绝' });
     } catch (err) {
       await connection.rollback();

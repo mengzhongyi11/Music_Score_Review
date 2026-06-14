@@ -274,6 +274,15 @@
   font-size: 11px; color: var(--text-tertiary);
   background: var(--bg-hover); padding: 0 7px; border-radius: 8px;
 }
+.notifMarkAllBtn {
+  font-size: 11px; color: var(--color-accent);
+  background: none; border: none; cursor: pointer;
+  padding: 2px 6px; border-radius: 4px;
+  font-family: inherit; white-space: nowrap;
+}
+.notifMarkAllBtn:hover {
+  background: var(--bg-hover);
+}
 
 .notifList {
   flex: 1;

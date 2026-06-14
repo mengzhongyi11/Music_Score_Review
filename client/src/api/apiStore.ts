@@ -8,11 +8,13 @@ import type {
   ScoreRow, SectionRow, CommentRow, UserRow,
   CollaboratorRow, VersionRow, BranchRow, TagRow,
   FeedItem, StatsRow, DashboardData, FullScore,
+  ReviewSuggestionRow,
 } from './index';
 import {
   scoresApi, sectionsApi, commentsApi, usersApi,
   versionsApi, branchesApi, collaboratorsApi,
   statsApi, dashboardApi, feedApi, tagsApi,
+  aiReviewApi,
 } from './index';
 
 /* ── Loading / Error 基础类型 ── */
@@ -193,8 +195,20 @@ export const useCommentsStore = create<CommentsStore>((set, get) => ({
   },
 
   createComment: async (data) => {
-    await commentsApi.create(data);
-    await get().fetchBySection(data.section_id);
+    const resp = await commentsApi.create(data);
+    // 把 ai_suggestion 合并到本地列表（GET 端不返回此字段）
+    if ((resp as any).ai_suggestion) {
+      set((state) => ({
+        list: {
+          ...state.list,
+          data: [{ ...resp, ai_suggestion: (resp as any).ai_suggestion }, ...state.list.data],
+        },
+      }));
+    } else {
+      await get().fetchBySection(data.section_id);
+    }
+    // 刷新乐谱列表以更新待审计数
+    try { useScoresStore.getState().fetchList(); } catch {}
   },
 
   resolveComment: async (id) => {
@@ -275,7 +289,7 @@ interface BranchesStore {
   fetchByScore: (scoreId: number) => Promise<void>;
   fetchDiff: (branchId: number) => Promise<void>;
   createBranch: (data: { score_id: number; name: string; created_by: number }) => Promise<void>;
-  mergeBranch: (branchId: number) => Promise<void>;
+  mergeBranch: (branchId: number, actorId?: number) => Promise<void>;
 }
 
 export const useBranchesStore = create<BranchesStore>((set, get) => ({
@@ -307,8 +321,8 @@ export const useBranchesStore = create<BranchesStore>((set, get) => ({
     await get().fetchByScore(data.score_id);
   },
 
-  mergeBranch: async (branchId) => {
-    await branchesApi.merge(branchId);
+  mergeBranch: async (branchId, actorId) => {
+    await branchesApi.merge(branchId, actorId);
     await get().fetchByScore((get().list.data.find((b) => b.id === branchId) as BranchRow).score_id);
   },
 }));
@@ -371,6 +385,48 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       set({ tags: { data, loading: false, error: null } });
     } catch (err: any) {
       set({ tags: { ...get().tags, loading: false, error: err.message } });
+    }
+  },
+}));
+
+/* ═══════════════════════════════════════════
+   AI 审阅 Store
+   ═══════════════════════════════════════════ */
+
+interface AiReviewState {
+  suggestions: ReviewSuggestionRow[];
+  loading: boolean;
+  error: string | null;
+  fetchSuggestions: (scoreId: number, params?: { status?: string; priority?: string }) => Promise<void>;
+  updateStatus: (id: number, status: string, reviewedBy?: number) => Promise<void>;
+}
+
+export const useAiReviewStore = create<AiReviewState>((set, get) => ({
+  suggestions: [],
+  loading: false,
+  error: null,
+
+  fetchSuggestions: async (scoreId, params) => {
+    set({ loading: true, error: null });
+    try {
+      const { suggestions } = await aiReviewApi.getSuggestions(scoreId, params);
+      set({ suggestions, loading: false });
+    } catch (err: any) {
+      set({ error: err.message, loading: false });
+    }
+  },
+
+  updateStatus: async (id, status, reviewedBy) => {
+    set((s) => ({
+      suggestions: s.suggestions.map((sg) =>
+        sg.id === id ? { ...sg, status: status as any, reviewed_by: reviewedBy || null } : sg
+      ),
+    }));
+    try {
+      await aiReviewApi.updateStatus(id, status, reviewedBy);
+    } catch (err: any) {
+      const scoreId = get().suggestions[0]?.score_id;
+      if (scoreId) get().fetchSuggestions(scoreId);
     }
   },
 }));
