@@ -1,0 +1,146 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-default);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+  padding: 0 7px;
+  border-radius: 8px;
+}
+
+/* 风险汇总 */
+.summary {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summaryValue {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.summaryLabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* 列表 */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.sectionName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.riskBadge {
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-family: var(--font-mono);
+}
+
+.noImpact {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding: var(--space-2) 0;
+}
+
+.impactRow {
+  padding: var(--space-2);
+  border-top: 1px solid var(--border-muted);
+}
+
+.impactHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 4px;
+}
+
+.impactType {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.impactSev {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.impactDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.impactSug {
+  font-size: 11px;
+  color: var(--color-accent);
+  line-height: 1.5;
+  padding: 4px 8px;
+  background: var(--color-accent-glow);
+  border-radius: var(--radius-sm);
+}

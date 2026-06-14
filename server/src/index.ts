@@ -16,6 +16,11 @@ import authRouter from './routes/auth';
 import importRouter from './routes/import';
 import invitationsRouter from './routes/invitations';
 import reviewsRouter from './routes/reviews';
+import notificationsRouter from './routes/notifications';
+import aiReviewRouter from './routes/aiReview';
+import mergeRouter from './routes/merge';
+import impactRouter from './routes/impact';
+import preferencesRouter from './routes/preferences';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -40,13 +45,24 @@ app.use('/api/auth', authRouter);
 app.use('/api/import', importRouter);
 app.use('/api/invitations', invitationsRouter);
 app.use('/api/reviews', reviewsRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/ai-review', aiReviewRouter);
+app.use('/api/merge', mergeRouter);
+app.use('/api/impact', impactRouter);
+app.use('/api/preferences', preferencesRouter);
 
 // 健康检查
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: '乐谱审阅系统 API 运行中' });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ 服务器启动成功：http://localhost:${PORT}`);
-  console.log(`📋 API 文档：http://localhost:${PORT}/api/health`);
-});
+// 导出 app 供测试使用
+export { app };
+
+// 非测试环境下启动服务器
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`✅ 服务器启动成功：http://localhost:${PORT}`);
+    console.log(`📋 API 文档：http://localhost:${PORT}/api/health`);
+  });
+}

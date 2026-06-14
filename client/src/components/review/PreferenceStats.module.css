@@ -1,0 +1,83 @@
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.header {
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: var(--space-4);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.statRow {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.statItem {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-2);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.statValue {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.statLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.barSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.barLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--border-default);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}

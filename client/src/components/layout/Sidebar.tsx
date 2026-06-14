@@ -118,16 +118,8 @@ export function Sidebar() {
     <aside className={styles.sidebar}>
       {/* ── 审阅状态 ── */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>审阅状态</h3>
+        <h3 className={styles.sectionTitle}>审阅状态 (点击筛选)</h3>
         <div className={styles.filterList}>
-          <button
-            className={`${styles.filterItem} ${activeFilter === 'all' ? styles.active : ''}`}
-            onClick={() => handleFilterClick('all')}
-          >
-            <span className={styles.filterDotAll}>○</span>
-            <span>全部乐谱</span>
-            <span className={styles.count}>{totalScores}</span>
-          </button>
           {filterConfig.map((f) => (
             <button
               key={f.value}
@@ -219,9 +211,7 @@ export function Sidebar() {
                 style={{ background: c.role === 'reviewer' ? '#3FB950' : '#8B949E' }}
               />
               <span className={styles.userName}>{c.name}</span>
-              <span className={styles.userStatus}>
-                {c.role === 'reviewer' ? '审阅人' : '贡献者'}
-              </span>
+              <span className={styles.userDate}>{new Date(c.created_at).toLocaleDateString('zh-CN')}</span>
             </div>
           ))}
           {collaborators.length === 0 && (

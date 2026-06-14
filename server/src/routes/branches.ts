@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db';
+import { createNotification } from './notifications';
 
 const router = Router();
 
@@ -143,6 +144,26 @@ router.post('/:branchId/merge', async (req: Request, res: Response) => {
     await connection.query('UPDATE branches SET status = ? WHERE id = ?', ['merged', branchId]);
 
     await connection.commit();
+
+    // 合并通知：通知乐谱主人和所有协作者
+    try {
+      const [scoreRows] = await pool.query('SELECT id, name, owner_id FROM scores WHERE id = (SELECT score_id FROM branches WHERE id = ?)', [branchId]);
+      const scoreInfo = (scoreRows as any[])[0];
+      if (scoreInfo) {
+        const actorId = req.body.actor_id || 1;
+        const msg = `已将「${scoreInfo.name}」的分支「${branchName}」合并到主库`;
+        // 通知乐谱主人
+        if (scoreInfo.owner_id && scoreInfo.owner_id !== actorId) {
+          await createNotification({ userId: scoreInfo.owner_id, type: 'merge', scoreId: scoreInfo.id, actorId, message: msg });
+        }
+        // 通知协作者
+        const [collabRows] = await pool.query('SELECT user_id FROM score_collaborators WHERE score_id = ? AND user_id != ?', [scoreInfo.id, actorId]);
+        for (const c of collabRows as any[]) {
+          await createNotification({ userId: c.user_id, type: 'merge', scoreId: scoreInfo.id, actorId, message: msg });
+        }
+      }
+    } catch (_) { /* 通知失败不阻塞 */ }
+
     res.json({
       message: `合并成功，共合并 ${overrideList.length} 处修改`,
       mergedCount: overrideList.length,

@@ -8,6 +8,17 @@
 # 项目文档
 CLAUDE.md
 
+# Claude Code 配置
+.claude/
+
+# AI API 密钥文件
+AI*.md
+
+# GB/T 标准文档
+简谱规则/
+五线谱规则/
+简谱五线谱映射规范.md
+
 # Dependencies
 node_modules/
 
@@ -20,6 +31,7 @@ client/dist/
 .env
 .env.local
 .env.*.local
+.env.example
 
 # OS
 .DS_Store
@@ -29,3 +41,6 @@ Thumbs.db
 # 临时文件
 *.tsbuildinfo
 *.tscache
+
+# 测试临时数据
+server/src/seed/*.sql

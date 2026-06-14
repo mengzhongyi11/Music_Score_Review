@@ -22,13 +22,17 @@ export function AnnotationModal({
 }: AnnotationModalProps) {
   const [input, setInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
     setSubmitting(true);
+    setError('');
     try {
       await onSubmit(input.trim());
       setInput('');
+    } catch (err: any) {
+      setError(err.message || '提交失败');
     } finally {
       setSubmitting(false);
     }
@@ -84,12 +88,18 @@ export function AnnotationModal({
         {/* 输入区 */}
         <div className={styles.inputArea}>
           <textarea
-            className={styles.textInput}
+            className={`${styles.textInput} ${error ? styles.inputError : ''}`}
             placeholder="输入批注内容..."
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => { setInput(e.target.value); if (error) setError(''); }}
             rows={2}
           />
+          {error && (
+            <div className={styles.filterError}>
+              <span className={styles.filterErrorIcon}>🚫</span>
+              <span>{error}</span>
+            </div>
+          )}
           <button
             className={styles.submitBtn}
             onClick={handleSubmit}

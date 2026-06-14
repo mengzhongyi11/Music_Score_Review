@@ -16,9 +16,11 @@ export function ScoreSettings() {
 
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [collabLoading, setCollabLoading] = useState(false);
-  const [inviteUserId, setInviteUserId] = useState('');
+  const [inviteSearch, setInviteSearch] = useState('');
+  const [inviteUserId, setInviteUserId] = useState<number | null>(null);
   const [inviteRole, setInviteRole] = useState<'reviewer' | 'contributor'>('contributor');
   const [inviteMessage, setInviteMessage] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [newOwnerId, setNewOwnerId] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [applications, setApplications] = useState<InvitationRow[]>([]);
@@ -52,17 +54,34 @@ export function ScoreSettings() {
     } catch {}
   };
 
+  const handleSearchUser = (query: string) => {
+    setInviteSearch(query);
+    if (!query.trim()) { setSearchResults([]); return; }
+    const q = query.toLowerCase();
+    const results = usersAPI.list.data
+      .filter((u) => u.id !== score?.owner_id && !collaborators.some((c: any) => c.user_id === u.id))
+      .filter((u) => (u.name || '').toLowerCase().includes(q) || (u.title || '').toLowerCase().includes(q));
+    setSearchResults(results.slice(0, 8));
+  };
+
+  const selectUser = (id: number) => {
+    setInviteUserId(id);
+    setInviteSearch(usersAPI.list.data.find((u) => u.id === id)?.name || '');
+    setSearchResults([]);
+  };
+
   const handleInvite = async () => {
     if (!inviteUserId || !scoreId) return;
     try {
       await invitationsApi.create({
         score_id: Number(scoreId),
-        user_id: Number(inviteUserId),
+        user_id: inviteUserId,
         invited_by: 1,
         type: 'invite',
         message: inviteMessage || undefined,
       });
-      setInviteUserId('');
+      setInviteUserId(null);
+      setInviteSearch('');
       setInviteMessage('');
       alert('邀请已发送，等待对方同意');
     } catch (err: any) {
@@ -115,7 +134,6 @@ export function ScoreSettings() {
   if (!score) return <Loading text="加载乐谱信息…" />;
 
   const isOwner = score.owner_id === 1; // 假设当前用户 ID=1
-  const availableUsers = usersAPI.list.data.filter((u) => u.id !== score.owner_id);
 
   return (
     <div className={styles.page}>
@@ -166,6 +184,7 @@ export function ScoreSettings() {
               <div key={c.id} className={styles.memberItem}>
                 <span className={styles.memberDot} style={{ background: '#3FB950' }} />
                 <span className={styles.memberName}>{c.name}</span>
+                <span className={styles.memberDate}>{new Date(c.created_at).toLocaleDateString('zh-CN')}</span>
                 <Badge variant={c.role === 'reviewer' ? 'info' : 'default'} label={c.role === 'reviewer' ? '审阅人' : '贡献者'} />
                 {isOwner && (
                   <button className={styles.removeBtn} onClick={() => handleRemoveCollaborator(c.id)}>✕</button>
@@ -191,15 +210,32 @@ export function ScoreSettings() {
 
           {isOwner && (
             <div className={styles.inviteForm}>
-              <h3 className={styles.formTitle}>邀请成员</h3>
+              <h3 className={styles.formTitle}>邀请成员（搜索昵称）</h3>
               <div className={styles.inviteRow}>
-                <select className={styles.select} value={inviteUserId} onChange={(e) => setInviteUserId(e.target.value)}>
-                  <option value="">选择用户…</option>
-                  {availableUsers.map((u) => (
-                    <option key={u.id} value={u.id}>{u.name} ({u.role})</option>
-                  ))}
-                </select>
-                <select className={styles.select} value={inviteRole} onChange={(e) => setInviteRole(e.target.value as any)}>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  <input
+                    className={styles.inviteSearchInput}
+                    placeholder="搜索昵称或用户名…"
+                    value={inviteSearch}
+                    onChange={(e) => handleSearchUser(e.target.value)}
+                  />
+                  {searchResults.length > 0 && (
+                    <div className={styles.searchDropdown}>
+                      {searchResults.map((u) => (
+                        <button key={u.id} className={styles.searchItem} onClick={() => selectUser(u.id)}>
+                          <span className={styles.searchName}>{u.name}</span>
+                          <span className={styles.searchTitle}>{u.title || u.role}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {inviteUserId && !searchResults.length && (
+                    <div className={styles.selectedUser}>
+                      已选: {usersAPI.list.data.find((u) => u.id === inviteUserId)?.name}
+                    </div>
+                  )}
+                </div>
+                <select className={styles.select} value={inviteRole} onChange={(e) => setInviteRole(e.target.value as any)} style={{ width: 100 }}>
                   <option value="contributor">贡献者</option>
                   <option value="reviewer">审阅人</option>
                 </select>

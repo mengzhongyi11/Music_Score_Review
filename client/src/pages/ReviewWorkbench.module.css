@@ -105,6 +105,11 @@
   background: var(--bg-hover);
   color: var(--text-primary);
 }
+.shareBtnActive {
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
 
 .submitBtn {
   padding: 7px 20px;
@@ -386,6 +391,50 @@
   background: var(--color-success-bg);
 }
 
+/* ── AI 初审标记 ── */
+.aiSuggestionBadge {
+  margin: var(--space-1) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.aiBadgeReject {
+  font-size: 10px;
+  font-weight: 600;
+  color: #cf222e;
+  background: #FFebe9;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.aiBadgeP0 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #cf222e;
+  background: #FFebe9;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.aiBadgeP1 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #d4920b;
+  background: #fff8c5;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.aiBadgeP2 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #1a7f37;
+  background: #dafbe1;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
 /* ── 协作者 ── */
 .collabSection {
   border-top: 1px solid var(--border-default);
@@ -554,6 +603,21 @@
 }
 .branchManageBtn:hover {
   background: var(--bg-hover);
+}
+
+/* ── AI 建议面板 ── */
+.aiPanel {
+  width: 380px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  overflow-y: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .branchPanelDesc {

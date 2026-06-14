@@ -3,6 +3,9 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FileTree } from '@/components/shared/FileTree';
 import { StaffView } from '@/components/notation/StaffView';
 import { VersionTimeline } from '@/components/review/VersionTimeline';
+import { AiSuggestionPanel } from '@/components/review/AiSuggestionPanel';
+import { ImpactAnalysisPanel } from '@/components/review/ImpactAnalysisPanel';
+import { PreferenceStats } from '@/components/review/PreferenceStats';
 import { Badge } from '@/components/shared/Badge';
 import { Button } from '@/components/shared/Button';
 import { Loading, ErrorMessage, EmptyState } from '@/components/shared/Loading';
@@ -43,6 +46,8 @@ export function ReviewWorkbench() {
   // 审阅历史（仅看板显示用）
   const [reviewHistory, setReviewHistory] = useState<any[]>([]);
   const [showReviewHistory, setShowReviewHistory] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+  const [showImpactPanel, setShowImpactPanel] = useState(false);
   useEffect(() => {
     if (selectedScoreId) {
       import('@/api').then(({ reviewsApi }) =>
@@ -95,21 +100,16 @@ export function ReviewWorkbench() {
     }
   }, [sectionsAPI.tree.data, selectedScoreId]);
 
-  // 提交批注
-  const handleSubmitComment = useCallback(async () => {
-    if (!commentInput.trim() || !selectedSection) return;
-    try {
-      await commentsAPI.createComment({
-        section_id: selectedSection.id,
-        user_id: 1,
-        content: commentInput.trim(),
-        measure_ref: `第${Math.floor(Math.random() * 32) + 1}小节`,
-      });
-      setCommentInput('');
-    } catch (err: any) {
-      alert('提交失败: ' + err.message);
-    }
-  }, [commentInput, selectedSection]);
+  // 提交批注（StaffView 传入 measure 和 content）
+  const handleSubmitComment = useCallback(async (_measure: number, content: string) => {
+    if (!content.trim() || !selectedSection) return;
+    await commentsAPI.createComment({
+      section_id: selectedSection.id,
+      user_id: 1,
+      content: content.trim(),
+      measure_ref: `第${_measure}小节`,
+    });
+  }, [selectedSection]);
 
   // 解决批注
   const handleResolve = async (id: number) => {
@@ -193,6 +193,18 @@ export function ReviewWorkbench() {
               📋 审阅记录 ({reviewHistory.length})
             </button>
           )}
+          <button
+            className={`${styles.shareBtn} ${showImpactPanel ? styles.shareBtnActive : ''}`}
+            onClick={() => setShowImpactPanel(!showImpactPanel)}
+          >
+            📊 影响分析
+          </button>
+          <button
+            className={`${styles.shareBtn} ${showAiPanel ? styles.shareBtnActive : ''}`}
+            onClick={() => setShowAiPanel(!showAiPanel)}
+          >
+            🤖 AI 建议
+          </button>
         </div>
       </div>
 
@@ -232,6 +244,20 @@ export function ReviewWorkbench() {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 影响分析面板 */}
+      {showImpactPanel && (
+        <div className={styles.aiPanel}>
+          <ImpactAnalysisPanel scoreId={selectedScoreId} />
+        </div>
+      )}
+
+      {/* AI 建议面板 */}
+      {showAiPanel && (
+        <div className={styles.aiPanel}>
+          <AiSuggestionPanel scoreId={selectedScoreId} />
         </div>
       )}
 
@@ -276,6 +302,20 @@ export function ReviewWorkbench() {
                       <Badge variant={c.status === 'open' ? 'awaiting_reply' : 'resolved'} />
                     </div>
                     <p className={styles.aiContent}>{c.content}</p>
+                    {/* AI 初审结果 */}
+                    {(c as any).ai_suggestion && (
+                      <div className={styles.aiSuggestionBadge}>
+                        <span className={
+                          (c as any).ai_suggestion.suggestionType === 'auto_reject' ? styles.aiBadgeReject :
+                          (c as any).ai_suggestion.priority === 'P0' ? styles.aiBadgeP0 :
+                          (c as any).ai_suggestion.priority === 'P1' ? styles.aiBadgeP1 :
+                          styles.aiBadgeP2
+                        }>
+                          {(c as any).ai_suggestion.priority === 'P0' ? '⚠ ' : ''}
+                          {(c as any).ai_suggestion.suggestionType === 'auto_reject' ? 'AI 已过滤' : `AI ${(c as any).ai_suggestion.priority}`}
+                        </span>
+                      </div>
+                    )}
                     <div className={styles.aiFooter}>
                       <span>{c.measure_ref || ''}{c.measure_ref && ' · '}{new Date(c.created_at).toLocaleDateString('zh-CN')}</span>
                       {c.status === 'open' && <button className={styles.resolveLink} onClick={() => handleResolve(c.id)}>标记解决</button>}

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import type { User, Annotation, Version, Notification, KanbanCard, ReviewStatus } from '@/types';
+import type { User, Annotation, Version, KanbanCard, ReviewStatus } from '@/types';
+import type { NotificationRow } from '@/api';
+import { notificationsApi } from '@/api';
 
 /* ── 用户状态 ── */
 interface UserState {
@@ -78,51 +80,92 @@ export const useSidebarStore = create<SidebarState>((set) => ({
   setActiveFilter: (filter) => set({ activeFilter: filter }),
 }));
 
-/* ── 通知状态 ── */
+/* ── 通知状态（API 驱动） ── */
 interface NotificationState {
-  notifications: Notification[];
+  notifications: NotificationRow[];
   unreadCount: number;
-  setNotifications: (n: Notification[]) => void;
-  addNotification: (n: Omit<Notification, 'id' | 'read' | 'createdAt'>) => void;
-  markRead: (id: string) => void;
+  loading: boolean;
+  fetchList: (userId?: number) => Promise<void>;
+  fetchUnreadCount: (userId?: number) => Promise<void>;
+  markRead: (id: number) => Promise<void>;
+  markAllRead: (userId?: number) => Promise<void>;
 }
 
+const DEFAULT_USER_ID = 1;
+
 export const useNotificationStore = create<NotificationState>((set) => ({
-  notifications: [
-    { id: 'n1', type: 'annotation' as const, message: '李四 在《月光变奏曲》第24小节添加了批注', read: false, createdAt: '2024-01-16T10:30:00' },
-    { id: 'n2', type: 'review' as const, message: '王五 提交了《春江花月夜》v3 审阅请求', read: false, createdAt: '2024-01-16T09:15:00' },
-  ],
-  unreadCount: 2,
-  setNotifications: (notifications) =>
-    set({ notifications, unreadCount: notifications.filter((n) => !n.read).length }),
-  addNotification: (n) =>
-    set((state) => {
-      const newNotif: Notification = {
-        id: `n${Date.now()}`,
-        read: false,
-        createdAt: new Date().toISOString(),
-        ...n,
-      };
-      const notifications = [newNotif, ...state.notifications].slice(0, 50);
-      return { notifications, unreadCount: notifications.filter((n) => !n.read).length };
-    }),
-  markRead: (id) =>
-    set((state) => {
-      const notifications = state.notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
-      );
-      return { notifications, unreadCount: notifications.filter((n) => !n.read).length };
-    }),
+  notifications: [],
+  unreadCount: 0,
+  loading: false,
+
+  fetchList: async (userId = DEFAULT_USER_ID) => {
+    set({ loading: true });
+    try {
+      const data = await notificationsApi.list(userId);
+      const active = data.filter(n => !n.is_read);
+      set({ notifications: data, unreadCount: active.length, loading: false });
+    } catch {
+      set({ loading: false });
+    }
+  },
+
+  fetchUnreadCount: async (userId = DEFAULT_USER_ID) => {
+    try {
+      const { count } = await notificationsApi.unreadCount(userId);
+      set({ unreadCount: count });
+    } catch {}
+  },
+
+  markRead: async (id) => {
+    // 乐观更新
+    set((s) => ({
+      notifications: s.notifications.map((n) =>
+        n.id === id ? { ...n, is_read: true as const } : n
+      ),
+      unreadCount: Math.max(0, s.unreadCount - 1),
+    }));
+    try {
+      await notificationsApi.markRead(id);
+    } catch {}
+  },
+
+  markAllRead: async (userId = DEFAULT_USER_ID) => {
+    set((s) => ({
+      notifications: s.notifications.map((n) => ({ ...n, is_read: true as const })),
+      unreadCount: 0,
+    }));
+    try {
+      await notificationsApi.markAllRead(userId);
+    } catch {}
+  },
 }));
 
-// 在全局监听合并通知事件
+// 定时的未读轮询 + 合并事件触发刷新
 if (typeof window !== 'undefined') {
-  window.addEventListener('merge-notification', ((e: CustomEvent) => {
-    const store = useNotificationStore.getState();
-    store.addNotification({
-      type: 'review',
-      message: `🎶 ${e.detail.message}`,
-    });
+  let pollTimer: ReturnType<typeof setInterval> | null = null;
+  function startPoll() {
+    if (pollTimer) return;
+    pollTimer = setInterval(() => {
+      useNotificationStore.getState().fetchUnreadCount();
+    }, 15000); // 15 秒轮询
+  }
+  // 页面可见时启动
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      useNotificationStore.getState().fetchUnreadCount();
+      startPoll();
+    } else if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  });
+  // 初始加载
+  useNotificationStore.getState().fetchList();
+  startPoll();
+
+  // 监听合并通知事件，触发重新获取
+  window.addEventListener('merge-notification', (() => {
+    useNotificationStore.getState().fetchUnreadCount();
   }) as EventListener);
 }
 
@@ -186,16 +229,28 @@ interface ThemeState {
   setTheme: (t: Theme) => void;
 }
 
+/** 获取初始主题：优先读取 localStorage，无则默认 light */
+function getInitialTheme(): Theme {
+  if (typeof document === 'undefined') return 'light';
+  const stored = localStorage.getItem('theme');
+  if (stored === 'dark' || stored === 'light') return stored;
+  // 默认浅色
+  document.documentElement.setAttribute('data-theme', 'light');
+  return 'light';
+}
+
 export const useThemeStore = create<ThemeState>((set) => ({
-  theme: (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') as Theme) || 'light',
+  theme: getInitialTheme(),
   toggleTheme: () =>
     set((state) => {
       const next = state.theme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
       return { theme: next };
     }),
   setTheme: (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
     set({ theme });
   },
 }));

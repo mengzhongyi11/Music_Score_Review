@@ -199,13 +199,41 @@ export function VexflowStaff({ parsed, onMeasureClick, markedMeasures }: Props) 
               continue;
             }
 
+            const dur = toVfDuration(tok.duration, tok.isDot);
+
+            // 和弦：多个键位
+            if (tok.isChord && tok.chordNotes && tok.chordNotes.length > 1) {
+              const keys = tok.chordNotes.map((cn) =>
+                jianpuToVexflowKey(rawKey, cn.pitch, cn.octaveDots, cn.accidental)
+              );
+              const note = new VF.StaveNote({
+                clef: 'treble',
+                keys,
+                duration: dur,
+                auto_stem: true,
+              });
+              if (tok.isAccent)
+                note.addModifier(new VF.Articulation('a>'), 0);
+              if (tok.isStaccato)
+                note.addModifier(new VF.Articulation('a.'), 0);
+              if (tok.isTenuto)
+                note.addModifier(new VF.Articulation('a-'), 0);
+              if (tok.fermata)
+                note.addModifier(new VF.Articulation('a@a'), 0);
+              if (tok.isDot) {
+                VF.Dot.buildAndAttach([note], { all: true });
+              }
+              vfNotes.push(note);
+              continue;
+            }
+
+            // 普通单音符
             const vfKey = jianpuToVexflowKey(
               rawKey,
               tok.pitch,
               tok.octaveDots,
               tok.accidental,
             );
-            const dur = toVfDuration(tok.duration, tok.isDot);
 
             const note = new VF.StaveNote({
               clef: 'treble',

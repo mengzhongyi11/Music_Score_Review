@@ -109,6 +109,28 @@
   font-size: 16px; color: var(--color-accent); font-weight: 500;
   font-family: var(--font-sans); letter-spacing: 0; white-space: nowrap;
 }
+
+/* ── 和弦纵向叠排 ── */
+.jpChord {
+  position: relative; display: inline-flex; flex-direction: column;
+  align-items: center; vertical-align: middle; padding: 4px 0;
+  min-height: 60px; justify-content: center;
+}
+.jpChordStack {
+  display: flex; flex-direction: column; align-items: center;
+  line-height: 1.15; gap: 1px;
+}
+.jpChordNote {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; line-height: 1.1;
+  position: relative; font-family: var(--font-mono), 'Noto Sans SC', sans-serif;
+}
+.jpChordAcc {
+  font-size: 16px; margin-right: 1px; color: var(--color-accent);
+}
+.jpChordOctave {
+  font-size: 14px; line-height: 1; pointer-events: none;
+}
 .jpBarline { color: var(--text-tertiary); font-size: 36px; margin-left: 8px; flex-shrink: 0; }
 .jpBeats {
   position: absolute; top: -16px; left: 6px;

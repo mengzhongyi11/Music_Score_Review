@@ -99,9 +99,14 @@ export interface KanbanCard {
 }
 
 export interface Notification {
-  id: string;
-  type: 'annotation' | 'review' | 'mention';
+  id: number;
+  type: 'merge' | 'review' | 'member_join' | 'invite' | 'invite_rejected';
+  user_id: number;
+  score_id: number | null;
+  actor_id: number | null;
+  actor_name?: string;
+  score_name?: string;
   message: string;
-  read: boolean;
-  createdAt: string;
+  is_read: boolean | number;
+  created_at: string;
 }

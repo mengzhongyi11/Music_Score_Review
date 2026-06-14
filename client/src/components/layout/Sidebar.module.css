@@ -247,10 +247,12 @@
   margin-left: auto;
   font-size: 11px;
   color: var(--text-tertiary);
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+.userDate {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-tertiary);
   white-space: nowrap;
-  max-width: 100px;
 }
 
 /* ── New elements ── */

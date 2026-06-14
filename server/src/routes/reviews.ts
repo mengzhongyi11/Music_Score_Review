@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db';
+import { createNotification } from './notifications';
 
 const router = Router();
 
@@ -37,6 +38,19 @@ router.post('/:scoreId', async (req: Request, res: Response) => {
       );
 
       await connection.commit();
+
+      // 审阅通知：通知乐谱主人
+      try {
+        const [sRows] = await pool.query('SELECT name, owner_id FROM scores WHERE id = ?', [scoreId]);
+        const sc = (sRows as any[])[0];
+        if (sc && sc.owner_id && sc.owner_id !== reviewer_id) {
+          const [uRows] = await pool.query('SELECT name FROM users WHERE id = ?', [reviewer_id]);
+          const reviewerName = (uRows as any[])[0]?.name || '管理员';
+          const st = status === 'approved' ? '已通过' : '未通过';
+          await createNotification({ userId: sc.owner_id, type: 'review', scoreId: Number(scoreId), actorId: reviewer_id, message: `${reviewerName} 审阅了「${sc.name}」：${st}` });
+        }
+      } catch (_) {}
+
       res.json({
         message: status === 'approved' ? '♩ 审阅已通过' : '审阅未通过',
         reviewId: (result as any).insertId,
