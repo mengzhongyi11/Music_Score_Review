@@ -4,7 +4,7 @@ import path from 'path';
 
 // 尝试从 .env 文件加载环境变量（开发环境，不提交到 git）
 try {
-  const envPath = path.resolve(__dirname, '../../.env');
+  const envPath = path.resolve(__dirname, '../.env');
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
     for (const line of lines) {
