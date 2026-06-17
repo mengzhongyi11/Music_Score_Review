@@ -22,8 +22,10 @@ interface DashScopeRequest {
 
 interface DashScopeResponse {
   output?: {
-    text?: string;
-    finish_reason?: string;
+    choices?: {
+      message?: { content?: string; role?: string };
+      finish_reason?: string;
+    }[];
   };
   usage?: { output_tokens: number };
 }
@@ -102,14 +104,14 @@ export async function aiReviewAnalyze(
   }
 
   const data = await response.json() as DashScopeResponse;
-  const text = data.output?.text;
-  if (!text) {
+  const reply = data.output?.choices?.[0]?.message?.content;
+  if (!reply) {
     throw new Error('DashScope 返回空结果');
   }
 
-  // 尝试提取 JSON
+  // 尝试从中提取 JSON
   try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = reply.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const result = JSON.parse(jsonMatch[0]);
       return {
@@ -120,15 +122,14 @@ export async function aiReviewAnalyze(
       };
     }
   } catch {
-    // JSON 解析失败，回退
+    // JSON 解析失败，回退到纯文本
   }
 
-  // 回退结果
   return {
     suggestionType: 'discuss',
     priority: 'P2',
     title: 'AI 审阅建议',
-    reason: text.slice(0, 500),
+    reason: reply.slice(0, 500),
   };
 }
 
