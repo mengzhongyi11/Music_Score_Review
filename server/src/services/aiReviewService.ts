@@ -49,7 +49,7 @@ export async function analyzeSubmission(input: AnalyzeInput): Promise<AnalyzeRes
   }
 
   // ======== Layer 2: RAG 规则知识库匹配 ========
-  const ragResult = ragFilter(content);
+  const ragResult = await ragFilter(content);
   if (!ragResult.passed) {
     return {
       passed: false,

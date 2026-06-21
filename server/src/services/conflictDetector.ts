@@ -5,7 +5,7 @@
 import { parseJianpu } from '../utils/notation';
 
 export interface ConflictItem {
-  type: 'note_content' | 'tempo' | 'key_signature' | 'time_signature' | 'metadata';
+  type: 'note_content' | 'tempo' | 'key_signature' | 'time_signature' | 'structural' | 'metadata';
   measureIndex?: number;
   noteIndex?: number;
   field?: string;
@@ -102,7 +102,8 @@ export function detectConflicts(input: DiffInput): ConflictResult {
           branchValue: bn.raw,
           description: `第 ${mi + 1} 小节第 ${ni + 1} 个音：音高 ${mn.pitch} → ${bn.pitch}`,
         });
-      } else if (mn.octaveDots !== bn.octaveDots) {
+      }
+      if (mn.octaveDots !== bn.octaveDots) {
         conflicts.push({
           type: 'note_content',
           measureIndex: mi + 1,
@@ -111,7 +112,8 @@ export function detectConflicts(input: DiffInput): ConflictResult {
           branchValue: bn.raw,
           description: `第 ${mi + 1} 小节第 ${ni + 1} 个音：八度变更（高音点 ${mn.octaveDots} → ${bn.octaveDots}）`,
         });
-      } else if (mn.accidental !== bn.accidental) {
+      }
+      if (mn.accidental !== bn.accidental) {
         conflicts.push({
           type: 'note_content',
           measureIndex: mi + 1,
@@ -120,7 +122,8 @@ export function detectConflicts(input: DiffInput): ConflictResult {
           branchValue: bn.raw,
           description: `第 ${mi + 1} 小节第 ${ni + 1} 个音：变音号 ${mn.accidental || ''} → ${bn.accidental || ''}`,
         });
-      } else if (mn.duration !== bn.duration) {
+      }
+      if (mn.duration !== bn.duration) {
         conflicts.push({
           type: 'note_content',
           measureIndex: mi + 1,
@@ -130,6 +133,26 @@ export function detectConflicts(input: DiffInput): ConflictResult {
           description: `第 ${mi + 1} 小节第 ${ni + 1} 个音：时值 ${mn.duration} → ${bn.duration}`,
         });
       }
+    }
+  }
+
+  // 4) 结构性校验：验证每个小节的时值总和是否匹配拍号
+  const beatsPerMeasure = branchParsed.totalBeats;
+  const beatUnit = branchParsed.beatUnit || 4;
+  for (let mi = 0; mi < branchParsed.measures.length; mi++) {
+    const measure = branchParsed.measures[mi];
+    const totalBeats = measure.notes.reduce((sum, n) => {
+      if (n.isRest || n.isExtension) return sum + (beatUnit / Math.max(n.duration, 4));
+      return sum + (beatUnit / n.duration) * (n.isDot ? 1.5 : 1);
+    }, 0);
+    if (Math.abs(totalBeats - beatsPerMeasure) > 0.01) {
+      conflicts.push({
+        type: 'structural',
+        measureIndex: mi + 1,
+        mainValue: `${beatsPerMeasure} 拍`,
+        branchValue: `${totalBeats.toFixed(1)} 拍`,
+        description: `第 ${mi + 1} 小节拍号 ${branchParsed.timeSignature}，应含 ${beatsPerMeasure} 拍，实际 ${totalBeats.toFixed(1)} 拍（时值${totalBeats > beatsPerMeasure ? '超出' : '不足'}）`,
+      });
     }
   }
 

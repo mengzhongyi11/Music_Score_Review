@@ -1,6 +1,8 @@
 import { detectConflicts } from './conflictDetector';
 
 describe('conflictDetector', () => {
+
+  // ── 基础检测 ──
   // 无冲突：前后内容一致
   test('identical content returns no conflicts', () => {
     const content = '1=C 4/4\n| 3 3 4 5 | 5 4 3 2 |';
@@ -71,6 +73,52 @@ describe('conflictDetector', () => {
     const result = detectConflicts({ mainContent: '', branchContent: '' });
     expect(result.hasConflict).toBe(false);
     expect(result.conflicts).toHaveLength(0);
+  });
+
+  // ── 同一个乐符多个属性同时变化 ──
+  test('same note with pitch AND duration change reports both', () => {
+    const main = '1=C 4/4\n| 3 4 5_ 6 |';     // 5_ 是八分音符
+    const branch = '1=C 4/4\n| 3 4 6 6 |';    // 6 是四分音符
+    const result = detectConflicts({ mainContent: main, branchContent: branch });
+    const noteConflicts = result.conflicts.filter(c => c.type === 'note_content');
+    // 第3个音：音高变了(5→6)，时值也变了(八分→四分)
+    // 两个独立 if，应报2条
+    expect(noteConflicts.length).toBeGreaterThanOrEqual(2);
+    expect(noteConflicts.some(c => c.description.includes('音高'))).toBe(true);
+    expect(noteConflicts.some(c => c.description.includes('时值'))).toBe(true);
+  });
+
+  // ── 结构性冲突：时值超出拍号 ──
+  test('structural conflict when beats exceed time signature', () => {
+    // 4/4 拍下有 5 拍的内容
+    const content = '1=C 4/4\n| 3 3 4 5 6 |';
+    const result = detectConflicts({ mainContent: content, branchContent: content });
+    const structuralConflicts = result.conflicts.filter(c => c.type === 'structural');
+    expect(structuralConflicts.length).toBe(1);
+    expect(structuralConflicts[0].description).toContain('超出');
+  });
+
+  test('structural conflict when beats are less than time signature', () => {
+    // 4/4 拍下只有 2 拍
+    const content = '1=C 4/4\n| 3 3 |';
+    const result = detectConflicts({ mainContent: content, branchContent: content });
+    const structuralConflicts = result.conflicts.filter(c => c.type === 'structural');
+    expect(structuralConflicts.length).toBe(1);
+    expect(structuralConflicts[0].description).toContain('不足');
+  });
+
+  test('no structural conflict when beats match time signature', () => {
+    const content = '1=C 4/4\n| 3 3 4 5 | 5 4 3 2 |';
+    const result = detectConflicts({ mainContent: content, branchContent: content });
+    expect(result.conflicts.filter(c => c.type === 'structural')).toHaveLength(0);
+  });
+
+  // ── 3/8 拍结构性校验 ──
+  test('structural validation with 3/8 time signature', () => {
+    // 3/8 拍下 3 个八分音符 = 3 拍
+    const ok = '1=C 3/8\n| 5 1 3 |';
+    const resultOk = detectConflicts({ mainContent: ok, branchContent: ok });
+    expect(resultOk.conflicts.filter(c => c.type === 'structural')).toHaveLength(0);
   });
 });
 

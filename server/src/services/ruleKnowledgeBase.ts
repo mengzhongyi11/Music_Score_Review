@@ -14,6 +14,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { ensureEmbeddings, searchSimilar } from './embeddingService';
 
 /* ── 一条规则条目 ── */
 export interface RuleEntry {
@@ -78,6 +79,21 @@ export function loadKnowledgeBase(): RuleEntry[] {
 
   console.log(`📚 RAG 知识库加载完成：${knowledgeBase.length} 条规则（简谱 + 五线谱 + 映射）`);
   return knowledgeBase;
+}
+
+/** 初始化向量索引（异步，不阻塞启动） */
+let embeddingsReady = false;
+export async function initVectorIndex(): Promise<void> {
+  if (embeddingsReady) return;
+  try {
+    const kb = loadKnowledgeBase();
+    const texts = kb.map(e => `${e.title} ${e.description}`);
+    await ensureEmbeddings(texts);
+    embeddingsReady = true;
+    console.log(`🧠 向量索引加载完成：${texts.length} 条`);
+  } catch (err) {
+    console.warn(`⚠ 向量索引加载失败（将降级为关键词匹配）: ${err instanceof Error ? err.message : ''}`);
+  }
 }
 
 /** 解析 GB/T 标准 .md 文件 */
@@ -202,15 +218,30 @@ function buildKeywordIndex(): void {
 
 /**
  * RAG 匹配：在知识库中搜索与输入最匹配的规则
+ * 优先使用向量检索，不可用时降级为关键词匹配
  */
-export function searchRules(input: string, topK: number = 3): RuleMatch[] {
+export async function searchRules(input: string, topK: number = 3): Promise<RuleMatch[]> {
   const kb = loadKnowledgeBase();
   if (!kb.length) return [];
 
+  // 优先使用向量检索
+  if (embeddingsReady) {
+    try {
+      const results = await searchSimilar(input, topK);
+      return results.map(r => ({
+        entry: kb[r.index],
+        score: Math.round(r.score * 100),
+        matchedKeywords: [],
+      }));
+    } catch {
+      // 向量检索失败，降级
+    }
+  }
+
+  // 降级：关键词匹配
   const inputKeywords = extractKeywords(input);
   if (!inputKeywords.length) return [];
 
-  // 计算每条规则的匹配分数
   const scores: { idx: number; score: number; matched: string[] }[] = [];
 
   for (let ei = 0; ei < kb.length; ei++) {
@@ -220,14 +251,12 @@ export function searchRules(input: string, topK: number = 3): RuleMatch[] {
 
     for (const kw of inputKeywords) {
       if (entry.keywords.includes(kw)) {
-        score += 3; // 精确关键词匹配
+        score += 3;
         matched.push(kw);
       } else if (entry.title.includes(kw) || entry.description.includes(kw)) {
-        score += 1; // 子串匹配
+        score += 1;
       }
     }
-
-    // 标题全匹配加成
     for (const kw of inputKeywords) {
       if (entry.title.includes(kw)) score += 5;
     }
@@ -237,7 +266,6 @@ export function searchRules(input: string, topK: number = 3): RuleMatch[] {
     }
   }
 
-  // 排序取前 K
   scores.sort((a, b) => b.score - a.score);
   return scores.slice(0, topK).map(s => ({
     entry: kb[s.idx],

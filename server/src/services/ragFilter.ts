@@ -23,14 +23,14 @@ export interface RagFilterResult {
  * RAG 规则匹配
  * @param input 用户批注内容
  */
-export function ragFilter(input: string): RagFilterResult {
+export async function ragFilter(input: string): Promise<RagFilterResult> {
   const text = input.trim();
   if (!text) {
     return { passed: false, reason: '内容为空' };
   }
 
-  // 搜索知识库中的匹配规则
-  const matches = searchRules(text, 3);
+  // 搜索知识库中的匹配规则（向量检索优先，关键词降级）
+  const matches = await searchRules(text, 3);
 
   // 完全无匹配：内容与简谱规范无关
   if (matches.length === 0 || matches[0].score < 5) {
@@ -63,11 +63,11 @@ export function ragFilter(input: string): RagFilterResult {
 /**
  * 用于 RAG 匹配失败时的测试（不含用户偏好权重）
  */
-export function ragFilterTest(input: string): {
+export async function ragFilterTest(input: string): Promise<{
   passed: boolean;
   matches: { sectionId: string; title: string; score: number; snippet: string }[];
-} {
-  const matches = searchRules(input, 3);
+}> {
+  const matches = await searchRules(input, 3);
 
   return {
     passed: matches.length > 0 && matches[0].score >= 5,
