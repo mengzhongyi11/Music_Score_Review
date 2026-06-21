@@ -284,6 +284,7 @@ export function VexflowStaff({ parsed, onMeasureClick, markedMeasures }: Props) 
             `VexFlow 渲染失败 (${parsed.key} 第${measureNum}小节):`,
             e,
           );
+          div.style.minHeight = '180px';
           div.style.opacity = '0.3';
           const err = document.createElement('span');
           err.style.cssText =

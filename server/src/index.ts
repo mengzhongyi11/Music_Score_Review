@@ -65,4 +65,8 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(`✅ 服务器启动成功：http://localhost:${PORT}`);
     console.log(`📋 API 文档：http://localhost:${PORT}/api/health`);
   });
+  // 异步初始化向量索引（不影响启动）
+  import('./services/ruleKnowledgeBase').then(({ initVectorIndex }) => {
+    initVectorIndex().catch(() => {});
+  });
 }
