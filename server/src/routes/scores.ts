@@ -23,8 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
       conditions.push('s.owner_id = ?');
       params.push(Number(owner_id));
     }
-    // 已通过/已驳回的超过一周自动隐藏
-    conditions.push("(s.review_status NOT IN ('approved','rejected') OR s.reviewed_at IS NULL OR s.reviewed_at >= NOW() - INTERVAL 7 DAY)");
+    // 前端控制看板列过期，API 返回全部
     if (conditions.length > 0) {
       query += ' WHERE ' + conditions.join(' AND ');
     }

@@ -18,6 +18,13 @@ const columns: { key: ColumnKey; label: string; color: string }[] = [
   { key: 'rejected',  label: '已驳回', color: 'var(--color-danger-text)' },
 ];
 
+/** 已通过/已驳回超过 7 天 → 看板列隐藏 */
+function isExpired(reviewedAt?: string | null): boolean {
+  if (!reviewedAt) return false;
+  const days = (Date.now() - new Date(reviewedAt).getTime()) / 86400000;
+  return days > 7;
+}
+
 /* 按 review_status 标签自动分配列（可重复出现在多列） */
 function getColumnsForScore(score: ScoreRow): ColumnKey[] {
   const cols: ColumnKey[] = [];
@@ -131,9 +138,9 @@ export function ProjectKanban() {
             let cards: { id: string; scoreId: number; name: string; content: string; date: string }[] = [];
 
             if (col.key === 'rejected') {
-              // 驳回：只显示状态为 rejected 的乐谱名
+              // 驳回：显示 rejected 乐谱（超过7天自动隐藏）
               cards = scoresAPI.list.data
-                .filter((s) => s.review_status === 'rejected')
+                .filter((s) => s.review_status === 'rejected' && !isExpired(s.reviewed_at))
                 .map((s) => ({ id: `r-${s.id}`, scoreId: s.id, name: s.name, content: '已驳回', date: '' }));
             } else if (col.key === 'working') {
               // 工作中：有未解决批注的乐谱（已通过或工作中）
@@ -155,9 +162,9 @@ export function ProjectKanban() {
                   date: new Date(a.created_at).toLocaleDateString('zh-CN'),
                 }));
             } else {
-              // 已通过：无批注或全部解决的乐谱
+              // 已通过：无批注或全部解决的乐谱（超过7天自动隐藏）
               cards = scoresAPI.list.data
-                .filter((s) => (s.comment_count ?? 0) === 0 || s.review_status === 'approved')
+                .filter((s) => ((s.comment_count ?? 0) === 0 || s.review_status === 'approved') && !isExpired(s.reviewed_at))
                 .map((s) => ({ id: `ap-${s.id}`, scoreId: s.id, name: s.name, content: '✓ 已通过', date: '' }));
             }
 
