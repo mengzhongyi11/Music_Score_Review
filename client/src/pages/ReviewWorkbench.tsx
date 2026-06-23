@@ -178,11 +178,11 @@ export function ReviewWorkbench() {
         </div>
         <div className={styles.headerActions}>
           <button className={styles.shareBtn} onClick={() => navigate(`/full-score/${selectedScoreId}`)}>
-            🎼 完整乐谱
+            完整乐谱
           </button>
           <button className={styles.shareBtn} onClick={() => setShowBranchPanel(!showBranchPanel)}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3v10M3 3l10 5-10 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            分支 ({branchesAPI.list.data.filter((b) => b.status === 'active').length})
+            分支
           </button>
           <button className={styles.shareBtn} onClick={() => navigate(`/settings/${selectedScoreId}`)}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.2"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M3.5 12.5L5 11M11 5l1.5-1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
@@ -190,20 +190,20 @@ export function ReviewWorkbench() {
           </button>
           {reviewHistory.length > 0 && (
             <button className={styles.shareBtn} onClick={() => setShowReviewHistory(!showReviewHistory)}>
-              📋 审阅记录 ({reviewHistory.length})
+              审阅记录
             </button>
           )}
           <button
             className={`${styles.shareBtn} ${showImpactPanel ? styles.shareBtnActive : ''}`}
             onClick={() => setShowImpactPanel(!showImpactPanel)}
           >
-            📊 影响分析
+            影响分析
           </button>
           <button
             className={`${styles.shareBtn} ${showAiPanel ? styles.shareBtnActive : ''}`}
             onClick={() => setShowAiPanel(!showAiPanel)}
           >
-            🤖 AI 建议
+            AI 建议
           </button>
         </div>
       </div>
@@ -244,20 +244,6 @@ export function ReviewWorkbench() {
               </Button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* 影响分析面板 */}
-      {showImpactPanel && (
-        <div className={styles.aiPanel}>
-          <ImpactAnalysisPanel scoreId={selectedScoreId} />
-        </div>
-      )}
-
-      {/* AI 建议面板 */}
-      {showAiPanel && (
-        <div className={styles.aiPanel}>
-          <AiSuggestionPanel scoreId={selectedScoreId} />
         </div>
       )}
 
@@ -373,6 +359,22 @@ export function ReviewWorkbench() {
           />
         </div>
       </div>
+
+      {/* AI 建议 + 影响分析（底部） */}
+      {(showAiPanel || showImpactPanel) && (
+        <div className={styles.bottomPanels}>
+          {showImpactPanel && (
+            <div className={styles.bottomPanel}>
+              <ImpactAnalysisPanel scoreId={selectedScoreId} />
+            </div>
+          )}
+          {showAiPanel && (
+            <div className={styles.bottomPanel}>
+              <AiSuggestionPanel scoreId={selectedScoreId} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 审阅历史弹窗 */}
       {showReviewHistory && (
