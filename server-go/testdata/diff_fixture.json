@@ -1,0 +1,647 @@
+[
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": false,
+      "conflicts": [],
+      "summary": "主库与分支内容一致，无冲突"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 5 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "5",
+          "description": "第 1 小节第 4 个音：音高 4 → 5"
+        }
+      ],
+      "summary": "检测到 1 处差异：第 1 小节第 4 个音：音高 4 → 5"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 .5 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": ".5",
+          "description": "第 1 小节第 4 个音：音高 4 → 5"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": ".5",
+          "description": "第 1 小节第 4 个音：八度变更（高音点 0 → -1）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 4 个音：音高 4 → 5；第 1 小节第 4 个音：八度变更（高音点 0 → -1）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 #4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "#4",
+          "description": "第 1 小节第 4 个音：变音号  → #"
+        }
+      ],
+      "summary": "检测到 1 处差异：第 1 小节第 4 个音：变音号  → #"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 4_ |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "4_",
+          "description": "第 1 小节第 4 个音：时值 4 → 8"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "3.5 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 3.5 拍（时值不足）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 4 个音：时值 4 → 8；第 1 小节拍号 4/4，应含 4 拍，实际 3.5 拍（时值不足）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 4 个音：4 → 无（音符数量变更）"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "3.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 4 个音：4 → 无（音符数量变更）；第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 4 5 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 5,
+          "mainValue": "(无)",
+          "branchValue": "5",
+          "description": "第 1 小节第 5 个音：无 → 5（音符数量变更）"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "5.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 5 个音：无 → 5（音符数量变更）；第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=G 4/4\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "key_signature",
+          "mainValue": "1=C",
+          "branchValue": "1=G",
+          "description": "调号变更：1=C → 1=G"
+        }
+      ],
+      "summary": "检测到 1 处差异：调号变更：1=C → 1=G"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "high",
+      "impacts": [
+        {
+          "type": "key",
+          "severity": "high",
+          "description": "调号从 1=C 改为 1=G",
+          "suggestion": "调号变更影响全曲音高体系，需确认是否为有意转调"
+        }
+      ]
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 3/4\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "time_signature",
+          "mainValue": "4/4",
+          "branchValue": "3/4",
+          "description": "拍号变更：4/4 → 3/4"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "3 拍",
+          "branchValue": "4.0 拍",
+          "description": "第 1 小节拍号 3/4，应含 3 拍，实际 4.0 拍（时值超出）"
+        }
+      ],
+      "summary": "检测到 2 处差异：拍号变更：4/4 → 3/4；第 1 小节拍号 3/4，应含 3 拍，实际 4.0 拍（时值超出）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "high",
+      "impacts": [
+        {
+          "type": "structure",
+          "severity": "high",
+          "description": "拍号从 4/4 改为 3/4",
+          "suggestion": "拍号变更影响全部小节的重音结构和节拍划分"
+        }
+      ]
+    }
+  },
+  {
+    "main": "1=C 4/4 Allegro\n| 1 2 3 4 |",
+    "branch": "1=C 4/4 Adagio\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "tempo",
+          "mainValue": "Allegro",
+          "branchValue": "Adagio",
+          "description": "速度变更：Allegro → Adagio"
+        }
+      ],
+      "summary": "检测到 1 处差异：速度变更：Allegro → Adagio"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4 ♩=120\n| 1 2 3 4 |",
+    "branch": "1=C 4/4 ♩=90\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "tempo",
+          "mainValue": "♩=120",
+          "branchValue": "♩=90",
+          "description": "速度变更：♩=120 → ♩=90"
+        }
+      ],
+      "summary": "检测到 1 处差异：速度变更：♩=120 → ♩=90"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "high",
+      "impacts": [
+        {
+          "type": "tempo",
+          "severity": "high",
+          "description": "速度变化 30 BPM（120 → 90），超过 20 BPM 阈值",
+          "suggestion": "大幅速度变化会影响乐章整体风格和演奏效果，建议确认是否必要"
+        }
+      ]
+    }
+  },
+  {
+    "main": "1=C 4/4 ♩=120\n| 1 2 3 4 |",
+    "branch": "1=C 4/4 ♩=108\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "tempo",
+          "mainValue": "♩=120",
+          "branchValue": "♩=108",
+          "description": "速度变更：♩=120 → ♩=108"
+        }
+      ],
+      "summary": "检测到 1 处差异：速度变更：♩=120 → ♩=108"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "medium",
+      "impacts": [
+        {
+          "type": "tempo",
+          "severity": "medium",
+          "description": "速度变化 12 BPM（120 → 108）",
+          "suggestion": "中等速度调整，需确保与相邻乐章的速度对比合理"
+        }
+      ]
+    }
+  },
+  {
+    "main": "1=C 4/4 ♩=120\n| 1 2 3 4 |",
+    "branch": "1=C 4/4 ♩=115\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "tempo",
+          "mainValue": "♩=120",
+          "branchValue": "♩=115",
+          "description": "速度变更：♩=120 → ♩=115"
+        }
+      ],
+      "summary": "检测到 1 处差异：速度变更：♩=120 → ♩=115"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 4 5 6 7 1 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 5,
+          "mainValue": "(无)",
+          "branchValue": "5",
+          "description": "第 1 小节第 5 个音：无 → 5（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 6,
+          "mainValue": "(无)",
+          "branchValue": "6",
+          "description": "第 1 小节第 6 个音：无 → 6（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 7,
+          "mainValue": "(无)",
+          "branchValue": "7",
+          "description": "第 1 小节第 7 个音：无 → 7（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 8,
+          "mainValue": "(无)",
+          "branchValue": "1",
+          "description": "第 1 小节第 8 个音：无 → 1（音符数量变更）"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "8.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 8.0 拍（时值超出）"
+        }
+      ],
+      "summary": "检测到 5 处差异：第 1 小节第 5 个音：无 → 5（音符数量变更）；第 1 小节第 6 个音：无 → 6（音符数量变更）；第 1 小节第 7 个音：无 → 7（音符数量变更）；第 1 小节第 8 个音：无 → 1（音符数量变更）；第 1 小节拍号 4/4，应含 4 拍，实际 8.0 拍（时值超出）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "high",
+      "impacts": [
+        {
+          "type": "structure",
+          "severity": "high",
+          "description": "音符数量大幅变化（4 → 8，比例 2.0x）",
+          "suggestion": "内容长度变化超过 50%，建议检查是否有遗漏或多余小节"
+        }
+      ]
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 4 个音：4 → 无（音符数量变更）"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "3.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 4 个音：4 → 无（音符数量变更）；第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "1=C 4/4\n| 1 2 3 4 5 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 5,
+          "mainValue": "(无)",
+          "branchValue": "5",
+          "description": "第 1 小节第 5 个音：无 → 5（音符数量变更）"
+        },
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "5.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+        }
+      ],
+      "summary": "检测到 2 处差异：第 1 小节第 5 个音：无 → 5（音符数量变更）；第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 0--- 1 2 |",
+    "branch": "1=C 4/4\n| 0--- 1 2 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "3.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+        }
+      ],
+      "summary": "检测到 1 处差异：第 1 小节拍号 4/4，应含 4 拍，实际 3.0 拍（时值不足）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1- 2 3 4 |",
+    "branch": "1=C 4/4\n| 1- 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "structural",
+          "measureIndex": 1,
+          "mainValue": "4 拍",
+          "branchValue": "5.0 拍",
+          "description": "第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+        }
+      ],
+      "summary": "检测到 1 处差异：第 1 小节拍号 4/4，应含 4 拍，实际 5.0 拍（时值超出）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "",
+    "branch": "1=C 4/4\n| 1 2 3 4 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 1,
+          "mainValue": "(无)",
+          "branchValue": "1",
+          "description": "第 1 小节第 1 个音：无 → 1（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 2,
+          "mainValue": "(无)",
+          "branchValue": "2",
+          "description": "第 1 小节第 2 个音：无 → 2（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 3,
+          "mainValue": "(无)",
+          "branchValue": "3",
+          "description": "第 1 小节第 3 个音：无 → 3（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "(无)",
+          "branchValue": "4",
+          "description": "第 1 小节第 4 个音：无 → 4（音符数量变更）"
+        }
+      ],
+      "summary": "检测到 4 处差异：第 1 小节第 1 个音：无 → 1（音符数量变更）；第 1 小节第 2 个音：无 → 2（音符数量变更）；第 1 小节第 3 个音：无 → 3（音符数量变更）；第 1 小节第 4 个音：无 → 4（音符数量变更）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| 1 2 3 4 |",
+    "branch": "",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 1,
+          "mainValue": "1",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 1 个音：1 → 无（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 2,
+          "mainValue": "2",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 2 个音：2 → 无（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 3,
+          "mainValue": "3",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 3 个音：3 → 无（音符数量变更）"
+        },
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "(无)",
+          "description": "第 1 小节第 4 个音：4 → 无（音符数量变更）"
+        }
+      ],
+      "summary": "检测到 4 处差异：第 1 小节第 1 个音：1 → 无（音符数量变更）；第 1 小节第 2 个音：2 → 无（音符数量变更）；第 1 小节第 3 个音：3 → 无（音符数量变更）；第 1 小节第 4 个音：4 → 无（音符数量变更）"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  },
+  {
+    "main": "1=C 4/4\n| [1 3 5] 2 3 4 |",
+    "branch": "1=C 4/4\n| [1 3 5] 2 3 6 |",
+    "conflicts": {
+      "hasConflict": true,
+      "conflicts": [
+        {
+          "type": "note_content",
+          "measureIndex": 1,
+          "noteIndex": 4,
+          "mainValue": "4",
+          "branchValue": "6",
+          "description": "第 1 小节第 4 个音：音高 4 → 6"
+        }
+      ],
+      "summary": "检测到 1 处差异：第 1 小节第 4 个音：音高 4 → 6"
+    },
+    "impact": {
+      "sectionId": "unknown",
+      "sectionName": "测试乐段",
+      "overallRisk": "low",
+      "impacts": []
+    }
+  }
+]

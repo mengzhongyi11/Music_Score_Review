@@ -1,0 +1,13 @@
+# 构建产物与本地文件不进镜像
+data/
+*.exe
+*.log
+.env
+.env.local
+.DS_Store
+
+# 测试基准数据（由 Node 版生成，仅本地对比用）
+testdata/
+
+# 文档
+README.md

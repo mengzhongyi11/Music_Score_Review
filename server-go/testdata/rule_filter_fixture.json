@@ -1,0 +1,220 @@
+[
+  {
+    "input": "",
+    "result": {
+      "passed": false,
+      "reason": "内容为空",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "   ",
+    "result": {
+      "passed": false,
+      "reason": "内容为空",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "ab",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "123",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "1234",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "999",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "test",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "ASDF",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "qwer",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "哈哈",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "呵呵",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "嗯",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "哦",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "1111",
+    "result": {
+      "passed": false,
+      "reason": "内容过短（少于5个字），无意义的测试内容",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "abcde",
+    "result": {
+      "passed": false,
+      "reason": "内容不包含任何音乐相关关键词，非专业术语",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "hello world",
+    "result": {
+      "passed": false,
+      "reason": "内容不包含任何音乐相关关键词，非专业术语",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "这是一段普通的中文内容",
+    "result": {
+      "passed": false,
+      "reason": "内容不包含任何音乐相关关键词，非专业术语",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "这里的拍号好像不对，应该是 3/4 拍",
+    "result": {
+      "passed": true
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "小节线画错了",
+    "result": {
+      "passed": true
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "建议调整力度标记",
+    "result": {
+      "passed": true
+    },
+    "priority": "P1"
+  },
+  {
+    "input": "速度标记错误，需要修正",
+    "result": {
+      "passed": true
+    },
+    "priority": "P0"
+  },
+  {
+    "input": "音符时值有问题",
+    "result": {
+      "passed": true
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "和弦配置不合理",
+    "result": {
+      "passed": true
+    },
+    "priority": "P2"
+  },
+  {
+    "input": "节拍异常，需要检查",
+    "result": {
+      "passed": false,
+      "reason": "内容不包含任何音乐相关关键词，非专业术语",
+      "suggestionType": "auto_reject"
+    },
+    "priority": "P0"
+  },
+  {
+    "input": "渐强记号位置可以优化",
+    "result": {
+      "passed": true
+    },
+    "priority": "P1"
+  },
+  {
+    "input": "调号变更需要确认",
+    "result": {
+      "passed": true
+    },
+    "priority": "P2"
+  }
+]
