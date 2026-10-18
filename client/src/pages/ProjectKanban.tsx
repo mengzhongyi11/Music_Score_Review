@@ -6,10 +6,11 @@ import { CreateScoreModal } from '@/components/shared/CreateScoreModal';
 import { ImportModal } from '@/components/shared/ImportModal';
 import { useScoresStore, useDashboardStore } from '@/api/apiStore';
 import { commentsApi, reviewsApi } from '@/api';
-import type { ScoreRow } from '@/api';
+import type { CommentWithScore } from '@/api';
+import { buildKanbanColumns, type KanbanCard, type KanbanStatus } from '@/utils/kanban';
 import styles from './ProjectKanban.module.css';
 
-type ColumnKey = 'pending' | 'approved' | 'working' | 'rejected';
+type ColumnKey = KanbanStatus;
 
 const columns: { key: ColumnKey; label: string; color: string }[] = [
   { key: 'pending',   label: '待审阅', color: 'var(--color-warning)' },
@@ -18,27 +19,6 @@ const columns: { key: ColumnKey; label: string; color: string }[] = [
   { key: 'rejected',  label: '已驳回', color: 'var(--color-danger-text)' },
 ];
 
-/** 已通过/已驳回超过 7 天 → 看板列隐藏 */
-function isExpired(reviewedAt?: string | null): boolean {
-  if (!reviewedAt) return false;
-  const days = (Date.now() - new Date(reviewedAt).getTime()) / 86400000;
-  return days > 7;
-}
-
-/* 按 review_status 标签自动分配列（可重复出现在多列） */
-function getColumnsForScore(score: ScoreRow): ColumnKey[] {
-  const cols: ColumnKey[] = [];
-  const st = score.review_status || 'approved';
-  if (st === 'rejected') { cols.push('rejected'); return cols; }
-  // 有批注 → 出现在待审阅
-  if ((score.comment_count ?? 0) > 0) cols.push('pending');
-  // 通过/无批注 → 出现在已通过
-  if (st === 'approved' || (score.comment_count ?? 0) === 0) cols.push('approved');
-  // 工作中（有未解决批注且状态为working）
-  if (st === 'working') cols.push('working');
-  return cols.length > 0 ? cols : ['approved'];
-}
-
 export function ProjectKanban() {
   const navigate = useNavigate();
   const scoresAPI = useScoresStore();
@@ -46,7 +26,7 @@ export function ProjectKanban() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
-  const [annotations, setAnnotations] = useState<any[]>([]);
+  const [annotations, setAnnotations] = useState<CommentWithScore[]>([]);
   const [reviewTarget, setReviewTarget] = useState<{ scoreId: number; name: string } | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewing, setReviewing] = useState(false);
@@ -81,6 +61,9 @@ export function ProjectKanban() {
   };
 
   const isLoading = scoresAPI.list.loading && scoresAPI.list.data.length === 0;
+
+  // 与侧边栏共用同一套推导逻辑，保证两处数字一致
+  const kanbanColumns = buildKanbanColumns(scoresAPI.list.data, annotations);
 
   return (
     <div className={styles.page}>
@@ -135,38 +118,7 @@ export function ProjectKanban() {
       {!isLoading && !scoresAPI.list.error && scoresAPI.list.data.length > 0 && (
         <div className={styles.kanban}>
           {columns.map((col) => {
-            let cards: { id: string; scoreId: number; name: string; content: string; date: string }[] = [];
-
-            if (col.key === 'rejected') {
-              // 驳回：显示 rejected 乐谱（超过7天自动隐藏）
-              cards = scoresAPI.list.data
-                .filter((s) => s.review_status === 'rejected' && !isExpired(s.reviewed_at))
-                .map((s) => ({ id: `r-${s.id}`, scoreId: s.id, name: s.name, content: '已驳回', date: '' }));
-            } else if (col.key === 'working') {
-              // 工作中：有未解决批注的乐谱（已通过或工作中）
-              const workingScoreIds = new Set(
-                annotations.filter((a) => a.status === 'open' && a.review_status !== 'rejected').map((a) => a.score_id)
-              );
-              cards = scoresAPI.list.data
-                .filter((s) => workingScoreIds.has(s.id))
-                .map((s) => ({ id: `w-${s.id}`, scoreId: s.id, name: s.name, content: '工作中', date: '' }));
-            } else if (col.key === 'pending') {
-              // 待审阅：每个未解决的批注一张卡片 + 审阅按钮
-              cards = annotations
-                .filter((a) => a.status === 'open' && a.review_status !== 'approved')
-                .map((a) => ({
-                  id: `a-${a.id}`,
-                  scoreId: a.score_id,
-                  name: a.score_name,
-                  content: a.content,
-                  date: new Date(a.created_at).toLocaleDateString('zh-CN'),
-                }));
-            } else {
-              // 已通过：无批注或全部解决的乐谱（超过7天自动隐藏）
-              cards = scoresAPI.list.data
-                .filter((s) => ((s.comment_count ?? 0) === 0 || s.review_status === 'approved') && !isExpired(s.reviewed_at))
-                .map((s) => ({ id: `ap-${s.id}`, scoreId: s.id, name: s.name, content: '✓ 已通过', date: '' }));
-            }
+            const cards: KanbanCard[] = kanbanColumns[col.key];
 
             return (
               <div key={col.key} className={styles.column}>

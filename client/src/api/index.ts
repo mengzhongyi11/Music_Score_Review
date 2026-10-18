@@ -22,8 +22,14 @@ async function request<T>(url: string, options?: RequestInit & ApiOptions): Prom
     if (qs) finalUrl += `?${qs}`;
   }
 
+  // 统一附加 JWT（登录后存在 localStorage）
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
   const res = await fetch(finalUrl, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
     ...options,
   });
 
@@ -98,6 +104,24 @@ export interface CommentRow {
     layer: 'rule' | 'rag' | 'ai';
     reason: string;
   } | null;
+}
+
+/**
+ * GET /comments/by-score 的返回行：在评论基础上 JOIN 了所属乐谱的信息。
+ * 看板与侧边栏的状态推导都依赖 review_status / score_id。
+ */
+export interface CommentWithScore {
+  id: number;
+  section_id: number;
+  user_id: number;
+  author: string;
+  content: string;
+  status: 'open' | 'resolved';
+  measure_ref: string | null;
+  created_at: string;
+  score_name: string;
+  score_id: number;
+  review_status: 'pending' | 'working' | 'approved' | 'rejected';
 }
 
 export interface UserRow {
@@ -238,6 +262,13 @@ export const scoresApi = {
       body: JSON.stringify({ new_owner_id: newOwnerId }),
     }),
 
+  /** 显式修改审阅状态（pending / working / approved / rejected） */
+  updateReviewStatus: (id: number, status: string, comment?: string) =>
+    request<{ message: string }>(`/scores/${id}/review-status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, comment }),
+    }),
+
   delete: (id: number) =>
     request<{ message: string }>(`/scores/${id}`, { method: 'DELETE' }),
 
@@ -287,7 +318,7 @@ export const sectionsApi = {
 
 export const commentsApi = {
   getAll: () =>
-    request<any[]>('/comments/by-score'),
+    request<CommentWithScore[]>('/comments/by-score'),
 
   getBySection: (sectionId: number) =>
     request<CommentRow[]>(`/comments/section/${sectionId}`),

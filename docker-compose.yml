@@ -1,0 +1,78 @@
+# 谱审 — 全栈一键部署
+# 服务：MySQL + Redis + 后端 API + 前端 nginx
+# 用法：docker compose up -d --build
+version: '3.8'
+
+services:
+  # 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: score-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpass}
+      MYSQL_DATABASE: score_review
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./server-go/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: score-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端 API（Go 版）
+  server-go:
+    build: ./server-go
+    container_name: score-server-go
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-rootpass}
+      DB_NAME: score_review
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      CLIENT_ORIGIN: http://localhost:80
+      DATA_DIR: /app/data
+    volumes:
+      # 向量缓存持久化，避免每次重启都重新调用 embedding API
+      - go_data:/app/data
+    ports:
+      - "3001:3001"
+
+  # 前端（nginx 托管 + 反代 /api）
+  client:
+    build: ./client
+    container_name: score-client
+    restart: unless-stopped
+    depends_on:
+      - server-go
+    ports:
+      - "80:80"
+
+volumes:
+  mysql_data:
+  go_data:

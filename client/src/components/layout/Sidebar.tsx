@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarStore } from '@/store';
-import { useScoresStore, useCommentsStore, useUsersStore, useDashboardStore } from '@/api/apiStore';
-import { collaboratorsApi } from '@/api';
+import { useScoresStore, useUsersStore, useDashboardStore } from '@/api/apiStore';
+import { collaboratorsApi, commentsApi } from '@/api';
+import type { CommentWithScore } from '@/api';
+import { countKanbanColumns } from '@/utils/kanban';
 import styles from './Sidebar.module.css';
 
 export type FilterValue = 'all' | 'pending' | 'working' | 'approved' | 'rejected';
@@ -18,7 +20,6 @@ export function Sidebar() {
   const { collapsed, activeFilter, setActiveFilter } = useSidebarStore();
   const navigate = useNavigate();
   const scoresAPI = useScoresStore();
-  const commentsAPI = useCommentsStore();
   const usersAPI = useUsersStore();
   const dashboardAPI = useDashboardStore();
 
@@ -26,7 +27,9 @@ export function Sidebar() {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('all');
   const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set());
 
-  // 首次加载数据
+  // 全部批注 —— 状态计数需要它才能与看板口径一致
+  const [annotations, setAnnotations] = useState<CommentWithScore[]>([]);
+
   // 协作者列表状态
   const [collaborators, setCollaborators] = useState<any[]>([]);
 
@@ -34,6 +37,7 @@ export function Sidebar() {
     scoresAPI.fetchList();
     usersAPI.fetchList();
     dashboardAPI.fetchStats();
+    commentsApi.getAll().then(setAnnotations).catch(() => {});
   }, []);
 
   // 当乐谱加载完成后，获取第一个乐谱的协作者
@@ -46,25 +50,16 @@ export function Sidebar() {
     }
   }, [scoresAPI.list.data]);
 
-  // 按审阅状态分配
-  const getStatus = (s: any): FilterValue => {
-    const st = s.review_status || 'approved';
-    return (['pending', 'working', 'approved', 'rejected'].includes(st) ? st : 'approved') as FilterValue;
-  };
-
-  // 筛选计数
-  const totalScores = scoresAPI.list.data.length;
-  const pendingCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'pending').length;
-  const workingCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'working').length;
-  const approvedCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'approved').length;
-  const rejectedCount = scoresAPI.list.data.filter((s) => getStatus(s) === 'rejected').length;
+  // 筛选计数：与看板共用 countKanbanColumns，
+  // 保证「侧边栏标签数字 == 看板列头数字」（含 7 天过期规则）
+  const columnCounts = countKanbanColumns(scoresAPI.list.data, annotations);
 
   const filterCounts: Record<FilterValue, number> = {
-    all: totalScores,
-    pending: pendingCount,
-    working: workingCount,
-    approved: approvedCount,
-    rejected: rejectedCount,
+    all: scoresAPI.list.data.length,
+    pending: columnCounts.pending,
+    working: columnCounts.working,
+    approved: columnCounts.approved,
+    rejected: columnCounts.rejected,
   };
 
   // 项目列表（从 API 获取的乐谱）

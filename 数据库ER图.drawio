@@ -1,0 +1,155 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="21.0.0">
+  <diagram id="score-review-er" name="数据库ER图">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===== 分组标题 ===== -->
+        <mxCell id="grp1" value="核心内容" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#1f4e79;" vertex="1" parent="1">
+          <mxGeometry x="40" y="8" width="230" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="grp2" value="协作与通知" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#375623;" vertex="1" parent="1">
+          <mxGeometry x="340" y="8" width="230" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="grp3" value="版本与分支" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#7f4f00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="8" width="240" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="grp4" value="审阅与元数据" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#5b3a70;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="8" width="250" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 核心内容 ===== -->
+        <mxCell id="users" value="&lt;b&gt;users 用户&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;name 用户名&lt;br&gt;password 密码&lt;br&gt;nickname 昵称&lt;br&gt;phone 手机号&lt;br&gt;phone_verified 已验证&lt;br&gt;avatar 头像&lt;br&gt;role 角色&lt;br&gt;title 职称&lt;br&gt;bio 简介&lt;br&gt;created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="230" height="230" as="geometry" />
+        </mxCell>
+
+        <mxCell id="scores" value="&lt;b&gt;scores 乐谱&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;name 乐谱名&lt;br&gt;composer 作曲者&lt;br&gt;description 描述&lt;br&gt;owner_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;is_public 是否公开&lt;br&gt;review_status 审阅状态&lt;br&gt;reviewed_by &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;review_comment 审阅意见&lt;br&gt;reviewed_at 审阅时间&lt;br&gt;created_at / updated_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="230" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sections" value="&lt;b&gt;sections 乐段&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;parent_id &lt;i&gt;(FK→sections 自引用)&lt;/i&gt;&lt;br&gt;name 乐段名&lt;br&gt;path 路径&lt;br&gt;type folder/section&lt;br&gt;content 乐谱内容&lt;br&gt;tempo 速度&lt;br&gt;key_signature 调号&lt;br&gt;time_signature 拍号&lt;br&gt;sort_order 排序&lt;br&gt;created_at / updated_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="230" height="260" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comments" value="&lt;b&gt;comments 评论/批注&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;section_id &lt;i&gt;(FK→sections)&lt;/i&gt;&lt;br&gt;user_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;author 作者（冗余）&lt;br&gt;content 内容&lt;br&gt;status open/resolved&lt;br&gt;measure_ref 引用小节&lt;br&gt;created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="870" width="230" height="190" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 协作与通知 ===== -->
+        <mxCell id="score_collaborators" value="&lt;b&gt;score_collaborators 协作者&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;user_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;role 角色&lt;br&gt;invited_by &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;created_at&lt;br&gt;&lt;i&gt;UNIQUE(score_id, user_id)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="340" y="40" width="230" height="175" as="geometry" />
+        </mxCell>
+
+        <mxCell id="invitations" value="&lt;b&gt;invitations 邀请/申请&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;user_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;invited_by &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;type invite/apply&lt;br&gt;status 处理状态&lt;br&gt;message 附言&lt;br&gt;created_at / updated_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="340" y="245" width="230" height="205" as="geometry" />
+        </mxCell>
+
+        <mxCell id="notifications" value="&lt;b&gt;notifications 通知&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;user_id &lt;i&gt;(FK→users 接收者)&lt;/i&gt;&lt;br&gt;type 通知类型&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;actor_id &lt;i&gt;(FK→users 触发者)&lt;/i&gt;&lt;br&gt;message 通知文字&lt;br&gt;is_read 是否已读&lt;br&gt;created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="340" y="480" width="230" height="190" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 版本与分支 ===== -->
+        <mxCell id="section_versions" value="&lt;b&gt;section_versions 乐段版本&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;section_id &lt;i&gt;(FK→sections)&lt;/i&gt;&lt;br&gt;name 历史名称&lt;br&gt;content 历史内容&lt;br&gt;tempo / key_signature&lt;br&gt;time_signature&lt;br&gt;created_at 版本时间&lt;br&gt;&lt;i&gt;快照式：用于回滚&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="40" width="250" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="branches" value="&lt;b&gt;branches 分支&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;name 分支名&lt;br&gt;status active/merged/closed&lt;br&gt;created_by &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="280" width="250" height="165" as="geometry" />
+        </mxCell>
+
+        <mxCell id="branch_overrides" value="&lt;b&gt;branch_overrides 分支改动&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;branch_id &lt;i&gt;(FK→branches)&lt;/i&gt;&lt;br&gt;section_id &lt;i&gt;(FK→sections)&lt;/i&gt;&lt;br&gt;name / content 改动后&lt;br&gt;tempo / key_signature&lt;br&gt;time_signature&lt;br&gt;created_at&lt;br&gt;&lt;i&gt;增量式：只存改动，用于合并&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="485" width="250" height="210" as="geometry" />
+        </mxCell>
+
+        <mxCell id="merge_conflicts" value="&lt;b&gt;merge_conflicts 合并冲突&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;branch_id &lt;i&gt;(FK→branches)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;section_id &lt;i&gt;(FK→sections)&lt;/i&gt;&lt;br&gt;conflict_type 冲突类型&lt;br&gt;main_content 主分支内容&lt;br&gt;branch_content 分支内容&lt;br&gt;conflict_detail 冲突描述&lt;br&gt;merge_suggestion AI 建议&lt;br&gt;status 状态&lt;br&gt;resolved_by &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;resolved_at / created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="735" width="250" height="265" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 审阅与元数据 ===== -->
+        <mxCell id="reviews" value="&lt;b&gt;reviews 审阅记录&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id &lt;i&gt;(FK→scores)&lt;/i&gt;&lt;br&gt;reviewer_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;status 审阅结果&lt;br&gt;comment 审阅意见&lt;br&gt;created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="40" width="250" height="165" as="geometry" />
+        </mxCell>
+
+        <mxCell id="review_suggestions" value="&lt;b&gt;review_suggestions AI建议&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;score_id / branch_id / section_id&lt;br&gt;layer rule/rag/ai 过滤层级&lt;br&gt;suggestion_type 建议类型&lt;br&gt;priority P0/P1/P2&lt;br&gt;title / content / reason&lt;br&gt;rag_context 检索上下文&lt;br&gt;token_usage &lt;i&gt;成本监控&lt;/i&gt;&lt;br&gt;model 模型名&lt;br&gt;status 处理状态&lt;br&gt;created_by / reviewed_by&lt;br&gt;reviewed_at / created_at" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="240" width="250" height="265" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tags" value="&lt;b&gt;tags 标签&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;name 标签名 (UNIQUE)&lt;br&gt;color 颜色" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="540" width="250" height="105" as="geometry" />
+        </mxCell>
+
+        <mxCell id="score_tags" value="&lt;b&gt;score_tags 乐谱标签&lt;/b&gt;&lt;br&gt;score_id &lt;i&gt;(PK, FK→scores)&lt;/i&gt;&lt;br&gt;tag_id &lt;i&gt;(PK, FK→tags)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="680" width="250" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user_preferences" value="&lt;b&gt;user_preferences 偏好&lt;/b&gt;&lt;br&gt;id &lt;i&gt;(PK)&lt;/i&gt;&lt;br&gt;user_id &lt;i&gt;(FK→users)&lt;/i&gt;&lt;br&gt;preference_key 偏好键&lt;br&gt;preference_value JSON 偏好值&lt;br&gt;weight 权重&lt;br&gt;created_at / updated_at&lt;br&gt;&lt;i&gt;UNIQUE(user_id, preference_key)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="805" width="250" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 关系连线 ===== -->
+        <mxCell id="e_users_scores" value="1:N owner_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#1f4e79;" edge="1" parent="1" source="users" target="scores">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_sections" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#1f4e79;" edge="1" parent="1" source="scores" target="sections">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sections_comments" value="1:N section_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#1f4e79;" edge="1" parent="1" source="sections" target="comments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_comments" value="1:N user_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#1f4e79;" edge="1" parent="1" source="users" target="comments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sections_sc" value="1:N section_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#82b366;" edge="1" parent="1" source="scores" target="score_collaborators">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_sc" value="1:N user_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#82b366;" edge="1" parent="1" source="users" target="score_collaborators">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_inv" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#82b366;" edge="1" parent="1" source="scores" target="invitations">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_noti" value="1:N user_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#82b366;" edge="1" parent="1" source="users" target="notifications">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_sv" value="1:N section_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1" source="sections" target="section_versions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_br" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1" source="scores" target="branches">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_br_bo" value="1:N branch_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1" source="branches" target="branch_overrides">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sec_bo" value="1:N section_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1" source="sections" target="branch_overrides">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_br_mc" value="1:N branch_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1" source="branches" target="merge_conflicts">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_rev" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="scores" target="reviews">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_rev" value="1:N reviewer_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="users" target="reviews">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_rs" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="scores" target="review_suggestions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_users_up" value="1:N user_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="users" target="user_preferences">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scores_st" value="1:N score_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="scores" target="score_tags">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_tags_st" value="1:N tag_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1" source="tags" target="score_tags">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sections_self" value="parent_id 自引用树" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;fontSize=10;strokeColor=#1f4e79;exitX=1;exitY=0.8;entryX=1;entryY=0.2;curved=1;" edge="1" parent="1" source="sections" target="sections">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

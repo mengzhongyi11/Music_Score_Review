@@ -25,7 +25,19 @@ export function ScoreSettings() {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [applications, setApplications] = useState<InvitationRow[]>([]);
 
+  // 审阅状态
+  const [reviewStatus, setReviewStatus] = useState<string>('pending');
+  const [reviewComment, setReviewComment] = useState('');
+  const [savingStatus, setSavingStatus] = useState(false);
+
   const score = scoresAPI.list.data.find((s) => s.id === Number(scoreId));
+
+  // 乐谱数据刷新后同步本地表单（用基础字段做依赖，避免每次渲染都重置）
+  useEffect(() => {
+    if (!score) return;
+    setReviewStatus(score.review_status || 'pending');
+    setReviewComment(score.review_comment || '');
+  }, [score?.id, score?.review_status, score?.review_comment]);
 
   useEffect(() => {
     if (scoreId) {
@@ -120,6 +132,20 @@ export function ScoreSettings() {
     }
   };
 
+  const handleSaveReviewStatus = async () => {
+    if (!scoreId) return;
+    setSavingStatus(true);
+    try {
+      await scoresApi.updateReviewStatus(Number(scoreId), reviewStatus, reviewComment || undefined);
+      await scoresAPI.fetchList(); // 刷新看板与侧边栏的计数
+      alert('♩ 审阅状态已更新');
+    } catch (err: any) {
+      alert('更新失败: ' + err.message);
+    } finally {
+      setSavingStatus(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!scoreId || deleteConfirm !== score?.name) return;
     try {
@@ -165,6 +191,53 @@ export function ScoreSettings() {
             <span className={styles.infoLabel}>创建时间</span>
             <span className={styles.infoValue}>{new Date(score.created_at).toLocaleDateString('zh-CN')}</span>
           </div>
+        </div>
+
+        {/* ── 审阅状态 ── */}
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>
+            审阅状态
+            <Badge variant={reviewStatus as any} />
+          </h2>
+
+          <p className={styles.formDesc}>
+            手动调整该乐谱的审阅阶段。这项操作会同步到项目看板与侧边栏计数。
+          </p>
+
+          <div className={styles.inviteRow}>
+            <select
+              className={styles.select}
+              value={reviewStatus}
+              onChange={(e) => setReviewStatus(e.target.value)}
+            >
+              <option value="pending">待审阅</option>
+              <option value="working">工作中</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已驳回</option>
+            </select>
+          </div>
+
+          {(reviewStatus === 'approved' || reviewStatus === 'rejected') && (
+            <div className={styles.inviteRow} style={{ marginTop: 8 }}>
+              <input
+                className={styles.inviteMsgInput}
+                placeholder="审阅意见（可选）…"
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+              />
+            </div>
+          )}
+
+          <div className={styles.inviteRow} style={{ marginTop: 8 }}>
+            <Button variant="primary" size="sm" onClick={handleSaveReviewStatus} disabled={savingStatus}>
+              {savingStatus ? '保存中…' : '保存状态'}
+            </Button>
+          </div>
+
+          <p className={styles.formDesc} style={{ marginTop: 8 }}>
+            已通过 / 已驳回的乐谱会在 <b>7 天</b>后从看板自动隐藏；
+            改回「待审阅」或「工作中」会清除审阅时间，不会被隐藏。
+          </p>
         </div>
 
         {/* ── 成员管理 ── */}

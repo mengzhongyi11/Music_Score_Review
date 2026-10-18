@@ -51,10 +51,10 @@
 | 状态管理   | Zustand                                 |
 | 样式       | CSS Modules                             |
 | 五线谱渲染 | VexFlow 4.x                             |
-| 后端框架   | Express + TypeScript                    |
-| 数据库     | MySQL 8+ (mysql2)                       |
+| 后端框架   | Go 1.26+ / Gin / sqlx                    |
+| 数据库     | MySQL 8+（原生 SQL）                     |
 | AI 服务    | 阿里云 DashScope（通义千问）            |
-| 测试       | Vitest (前端) + Jest + Supertest (后端) |
+| 测试       | Vitest（前端）+ Go testing (后端)       |
 
 ---
 
@@ -62,27 +62,28 @@
 
 ### 环境要求
 
-- Node.js 18+
+- **Go 1.26+**（后端；依赖 `go-redis` 要求该版本）
+- Node.js 18+、npm（前端）
 - MySQL 8+
-- npm 或 yarn
+- Redis（可选，不启动会自动降级为直查数据库）
 
 ### 1. 数据库初始化
 
 ```bash
 # 创建数据库并导入表结构
-mysql -u root -p < server/src/schema.sql
+mysql -u root -p < server-go/db/schema.sql
 
 # 导入种子数据（可选）
-mysql -u root -p < server/src/seed.sql
+mysql -u root -p < server-go/db/seed.sql
 ```
 
 ### 2. 配置环境变量
 
 ```bash
-cp server/.env.example server/.env
+cp server-go/.env.example server-go/.env
 ```
 
-编辑 `server/.env`：
+编辑 `server-go/.env`：
 
 ```env
 DB_HOST=localhost
@@ -98,9 +99,8 @@ DASHSCOPE_API_KEY=sk-your_key_here
 ### 3. 启动后端
 
 ```bash
-cd server
-npm install
-npm run dev
+cd server-go
+go run ./cmd/api
 # → http://localhost:3001
 ```
 
@@ -115,13 +115,23 @@ npm run dev
 
 ### 5. 访问
 
-浏览器打开 `http://localhost:5173`，默认账户：
+浏览器打开 `http://localhost:5173`。
 
-| 用户   | 角色        | 说明           |
-| ------ | ----------- | -------------- |
-| 张教授 | admin       | 管理员，可审阅 |
-| 李同学 | contributor | 协作成员       |
-| 王同学 | contributor | 协作成员       |
+**测试账号**（均由 `server-go/db/seed.sql` 初始化，密码统一为 `1234`）：
+
+| 用户名 | 密码 | 角色 | 说明 |
+|--------|------|------|------|
+| **张教授** | `1234` | admin | **主测账号**，可提交审阅（通过/驳回） |
+| 管理员 | `1234` | admin | 系统管理员 |
+| 王老师 | `1234` | reviewer | 审阅人 |
+| 李同学 | `1234` | contributor | 贡献者 |
+| 陈同学 | `1234` | contributor | 贡献者 |
+
+> ⚠️ **张教授的角色必须是 admin**：前端审阅按钮硬编码了 `reviewer_id: 1`，后端也要求
+> admin 角色才能提交审阅。若重置数据库后无法审阅，请检查该账号的角色。
+>
+> 密码存储方式：`sha256(明文)` 的十六进制**前 20 位**（例如 `1234` → `03ac674216f3e15c761e`），
+> 与后端校验逻辑一致。新增演示账号时需按同样算法生成哈希。
 
 ---
 
@@ -144,16 +154,20 @@ d:\React project\
 │   │   ├── types/            # TypeScript 类型
 │   │   └── utils/            # 工具函数（简谱解析/VexFlow 封装）
 │   └── index.html
-├── server/                    # 后端 Express API
-│   ├── src/
-│   │   ├── routes/           # API 路由
+├── server-go/                 # 后端 Go + Gin API
+│   ├── cmd/api/              # 程序入口
+│   ├── internal/
+│   │   ├── handlers/         # HTTP handler（每个资源一个文件）
 │   │   ├── services/         # 业务逻辑（AI/冲突检测/影响分析/偏好学习）
-│   │   ├── utils/            # 简谱解析（服务端）
-│   │   ├── seed/             # 种子数据
-│   │   ├── db.ts             # 数据库连接
-│   │   ├── schema.sql        # 建表脚本
-│   │   └── index.ts          # Express 入口
-│   └── .env.example          # 环境变量模板
+│   │   ├── notation/         # 简谱解析器
+│   │   ├── rules/            # GB/T 规则知识库（go:embed）
+│   │   ├── router/           # 路由注册
+│   │   ├── middleware/       # JWT / CORS / 日志
+│   │   ├── database/         # 连接池 + 事务
+│   │   └── httpx/            # 响应与时间格式
+│   ├── db/                   # schema.sql / seed.sql / ai-review-seed.sql
+│   ├── testdata/             # 契约基准数据
+│   └── scripts/              # 迁移期对比脚本
 ├── image/                     # 项目截图
 ├── 简谱规则/                   # GB/T 46845-2025 标准文档（RAG 知识库）
 ├── 五线谱规则/                 # GB/T 46846-2025 标准文档（RAG 知识库）
@@ -329,7 +343,7 @@ d:\React project\
 
 ```bash
 # 后端测试
-cd server && npm test
+cd server-go && go test ./internal/...
 
 # 前端测试
 cd client && npm test

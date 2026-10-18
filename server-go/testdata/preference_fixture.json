@@ -1,0 +1,217 @@
+{
+  "features": [
+    {
+      "input": "力度标记需要调整",
+      "features": [
+        "力度"
+      ]
+    },
+    {
+      "input": "速度太快了",
+      "features": [
+        "速度"
+      ]
+    },
+    {
+      "input": "调号是 1=G",
+      "features": [
+        "调号"
+      ]
+    },
+    {
+      "input": "拍号 3/4 不对",
+      "features": [
+        "拍号"
+      ]
+    },
+    {
+      "input": "这里的音高有问题",
+      "features": [
+        "音高"
+      ]
+    },
+    {
+      "input": "音符时值错误",
+      "features": [
+        "音高"
+      ]
+    },
+    {
+      "input": "小节 5 有问题",
+      "features": [
+        "音高"
+      ]
+    },
+    {
+      "input": "1=G 调号",
+      "features": [
+        "调号"
+      ]
+    },
+    {
+      "input": "ff 太强了",
+      "features": [
+        "力度"
+      ]
+    },
+    {
+      "input": "♩=120 太快",
+      "features": [
+        "速度"
+      ]
+    },
+    {
+      "input": "tempo 标记",
+      "features": [
+        "力度",
+        "速度"
+      ]
+    },
+    {
+      "input": "BPM 偏高",
+      "features": [
+        "速度"
+      ]
+    },
+    {
+      "input": "cresc 记号",
+      "features": [
+        "力度"
+      ]
+    },
+    {
+      "input": "mf 改为 p",
+      "features": [
+        "力度"
+      ]
+    },
+    {
+      "input": "完全无关的内容",
+      "features": []
+    },
+    {
+      "input": "节奏",
+      "features": []
+    },
+    {
+      "input": "音",
+      "features": [
+        "音高"
+      ]
+    },
+    {
+      "input": "",
+      "features": []
+    }
+  ],
+  "reject": [
+    {
+      "content": "这是一段测试内容",
+      "patterns": [],
+      "result": false
+    },
+    {
+      "content": "无意义的批注",
+      "patterns": [
+        "无意义",
+        "测试"
+      ],
+      "result": true
+    },
+    {
+      "content": "完全正常的意见",
+      "patterns": [
+        "无意义",
+        "测试"
+      ],
+      "result": false
+    },
+    {
+      "content": "abc",
+      "patterns": [
+        "abc",
+        "xyz"
+      ],
+      "result": true
+    }
+  ],
+  "stats": [
+    {
+      "input": {
+        "total": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "dismissed": 0
+      },
+      "result": {
+        "totalProcessed": 0,
+        "acceptanceRate": 0,
+        "rejectionRate": 0,
+        "aiAccuracy": 0,
+        "commonErrors": []
+      }
+    },
+    {
+      "input": {
+        "total": 10,
+        "accepted": 6,
+        "rejected": 3,
+        "dismissed": 1,
+        "aiSuggestions": 8,
+        "aiAccepted": 6
+      },
+      "result": {
+        "totalProcessed": 10,
+        "acceptanceRate": 0.6,
+        "rejectionRate": 0.3,
+        "aiAccuracy": 0.75,
+        "commonErrors": []
+      }
+    },
+    {
+      "input": {
+        "total": 5,
+        "accepted": 0,
+        "rejected": 5,
+        "dismissed": 0,
+        "aiSuggestions": 0,
+        "aiAccepted": 0
+      },
+      "result": {
+        "totalProcessed": 5,
+        "acceptanceRate": 0,
+        "rejectionRate": 1,
+        "aiAccuracy": 0,
+        "commonErrors": []
+      }
+    },
+    {
+      "input": {
+        "total": 3,
+        "accepted": 3,
+        "rejected": 0,
+        "dismissed": 0,
+        "aiSuggestions": 3,
+        "aiAccepted": 1,
+        "commonErrors": [
+          {
+            "type": "拍号",
+            "count": 2
+          }
+        ]
+      },
+      "result": {
+        "totalProcessed": 3,
+        "acceptanceRate": 1,
+        "rejectionRate": 0,
+        "aiAccuracy": 0.3333333333333333,
+        "commonErrors": [
+          {
+            "type": "拍号",
+            "count": 2
+          }
+        ]
+      }
+    }
+  ]
+}
